@@ -1,7 +1,7 @@
 import {api} from './api';
 import axios from 'axios';
 export const getCategories = (response) => {
-  api.get('/task-categories').then((res) => response(res));
+  api.get('/task-categories-as-tree').then((res) => response(res));
 };
 
 export const getSubCategories = (catId, response) => {

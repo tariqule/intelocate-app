@@ -21,7 +21,7 @@ const DropDown = (props) => {
 
   const _onChangeValue = (val) => {
     setSelected(val);
-    props.onChange(val);
+    props.onChange && props.onChange(val);
   };
   return (
     <Form style={containerStyle}>
@@ -33,7 +33,11 @@ const DropDown = (props) => {
         onValueChange={_onChangeValue}>
         {data
           ? data.map((data) => (
-              <Picker.Item key={data.id} label={data.name} value={data.id} />
+              <Picker.Item
+                key={data.id}
+                label={data.name}
+                value={props.id ? data.id : data.name}
+              />
             ))
           : showStatus.map((data) => (
               <Picker.Item
