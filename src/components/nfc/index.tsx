@@ -2,46 +2,6 @@ import React from 'react';
 import {View, Text, TouchableOpacity, Platform} from 'react-native';
 import NfcManager, {NfcTech} from 'react-native-nfc-manager';
 
-// class Nfc extends React.Component {
-//   componentDidMount() {
-//     NfcManager.start();
-//   }
-
-//   componentWillUnmount() {
-//     this._cleanUp();
-//   }
-
-//   render() {
-//     return (
-//       <View style={{padding: 20}}>
-//         <Text>NFC </Text>
-//         <TouchableOpacity
-//           style={{
-//             padding: 10,
-//             width: 200,
-//             margin: 20,
-//             borderWidth: 1,
-//             borderColor: 'black',
-//           }}
-//           onPress={this._test}>
-//           <Text>Test</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity
-//           style={{
-//             padding: 10,
-//             width: 200,
-//             margin: 20,
-//             borderWidth: 1,
-//             borderColor: 'black',
-//           }}
-//           onPress={this._cleanUp}>
-//           <Text>Cancel Test</Text>
-//         </TouchableOpacity>
-//       </View>
-//     );
-//   }
-
 export const _cleanUp = () => {
   NfcManager.cancelTechnologyRequest().catch(() => 0);
 };
@@ -72,5 +32,3 @@ export const _NfcOn = async (responseTag) => {
     _cleanUp();
   }
 };
-
-// export default Nfc;

@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -44,7 +45,7 @@ import PopUp from 'react-native-modal';
 import {Modal_PopUp} from '../../../components/popup';
 import {_NfcOn, _cleanUp} from '../../../components/nfc';
 import * as Animatable from 'react-native-animatable';
-
+import {getUserByNfc} from '../../../services/nfc';
 const dataArray = [
   {
     title: 'Announcements:',
@@ -104,6 +105,10 @@ const dashboard = () => {
   const [headerTitleState, setHeaderTitleState] = React.useState('');
   const [showPopup, setShowPopup] = React.useState(false);
   const [IssueNumber, setIssueNumber] = React.useState('');
+  // const [nfcId, setNfcId] = React.useState();
+
+  //etag
+  const [etagLocationId, setEtagLocationId] = React.useState('');
 
   const _handleBack = () => {
     _cleanUp();
@@ -112,7 +117,13 @@ const dashboard = () => {
 
   const _handleReportIssueButton = () => {
     setModalVisibility(true);
-    _NfcOn();
+    _NfcOn((res) => {
+      getUserByNfc(res, (res) => {
+        Alert.alert('NFC tag found!', res);
+        setEtagLocationId(res);
+      });
+      // setNfcId(res);
+    });
     setHeaderTitleState('Log Issue');
   };
   return (
@@ -155,6 +166,7 @@ const dashboard = () => {
           console.log(issueNumber);
           setIssueNumber(issueNumber);
         }}
+        nfcLocationId={etagLocationId}
       />
       {showPopup && (
         <Modal_PopUp
@@ -179,6 +191,7 @@ interface actionModalProps {
   onPressBackButton: () => void;
   headerTitle: string;
   didSubmit?: (boolean, IssueNumber) => void;
+  nfcLocationId: string;
 }
 const ActionModal = (props: actionModalProps) => {
   const [organization, setOrganization] = React.useState([]);
@@ -297,7 +310,7 @@ const ActionModal = (props: actionModalProps) => {
   const _onPressSubmit = () => {
     const task = {
       categoryId: selectedCategoryId,
-      locationId: selectedLocationId,
+      locationId: props.nfcLocationId || selectedLocationId,
       externalCreatorId: externalCreatorID,
       name: selectedCategoryIssue,
       status: 'NEW',

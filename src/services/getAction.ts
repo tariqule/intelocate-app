@@ -1,4 +1,5 @@
 import {api} from './api';
+import Axios from 'axios';
 
 export const getAction = (params, reposnse) => {
   console.log(
@@ -7,7 +8,7 @@ export const getAction = (params, reposnse) => {
   api
     .post('/list-tasks', params)
     .then((response) => reposnse(response))
-    .then((err) =>
+    .catch((err) =>
       console.log(JSON.stringify(err) + 'Error: [get Action Service]'),
     );
 };
@@ -17,4 +18,11 @@ export const getSpecificTask = (taskId: string, response: any) => {
     .get(`/task/${taskId}`)
     .then((res) => response(res))
     .catch((err) => alert(err));
+};
+
+export const updateAction = (id: string, params, response: any) => {
+  console.log(JSON.stringify(params));
+  Axios.put(`https://mobile.intelocate.com/api/task/${id}`, params)
+    .then((res) => response(res))
+    .catch((Error) => console.log(Error));
 };
