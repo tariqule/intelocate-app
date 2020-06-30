@@ -21,8 +21,13 @@ const DropDown = (props) => {
 
   const _onChangeValue = (val, index) => {
     setSelected(val);
-    props.showStatus && props.onChange && props.onChange(val, data[index]);
+
+    // props.organization && props.onChange && props.onChange(val, data[index]);
     !props.showStatus && props.onChange && props.onChange(val);
+  };
+  const _onChangeOrg = (val, index) => {
+    setSelected(val);
+    props.onChange && !props.showStatus && props.onChange(val, data[index]);
   };
   return (
     <Form style={containerStyle}>
@@ -31,7 +36,7 @@ const DropDown = (props) => {
         mode={props.mode || 'dropdown'}
         style={[{width: 100, height: 40}, style]}
         selectedValue={props.value || selected}
-        onValueChange={_onChangeValue}>
+        onValueChange={props.organization ? _onChangeOrg : _onChangeValue}>
         {!props.showStatus
           ? data
             ? data.map((data) => (

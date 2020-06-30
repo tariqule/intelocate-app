@@ -494,7 +494,7 @@ export const ActionModal = (props: actionModalProps) => {
   };
   //
   const _onChangeOrganization = (val, data) => {
-    // console.log(JSON.stringify(data) + ' ====> pressed data');
+    console.warn(JSON.stringify(data) + ' ====> pressed data');
     if (isConnected) {
       getListLocationByOrganization(val, (res) => {
         // offlineOrganizationList(res.data);
@@ -502,7 +502,7 @@ export const ActionModal = (props: actionModalProps) => {
         setUserLocations(res.data);
       });
     } else {
-      setUserLocations(data.locations);
+      setUserLocations(data.locations && data.locations);
     }
     console.log(val);
   };
@@ -606,6 +606,7 @@ export const ActionModal = (props: actionModalProps) => {
                 // value={organization.id}
 
                 data={organization}
+                organization={true}
                 // defaultValue={Location}
                 // disabled={true}
                 id={true}
