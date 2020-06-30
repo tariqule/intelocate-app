@@ -502,7 +502,7 @@ export const ActionModal = (props: actionModalProps) => {
         setUserLocations(res.data);
       });
     } else {
-      setUserLocations(data.locations && data.locations);
+      setUserLocations(data.locations);
     }
     console.log(val);
   };

@@ -1,3 +1,4 @@
+import {storeUserInfo} from './local-storage/index';
 import {api} from './api';
 import {getCurrentUser} from './getUser';
 import Axios from 'axios';
@@ -12,12 +13,13 @@ export const signin = (
 ) => {
   api
     .post('/authenticate', {email, password})
-    .then((res) => {
-      response(res);
+    .then((resAuth) => {
+      api.get('/user').then((res) => {
+        storeUserInfo(res.data);
+        response(resAuth);
+      });
     })
-    .then(() => {
-      getCurrentUser();
-    })
+    .then(() => {})
     .catch((err) => error(err));
 };
 

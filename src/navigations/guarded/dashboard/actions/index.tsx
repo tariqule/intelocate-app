@@ -29,6 +29,11 @@ import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import {selectedAction} from '../../../../redux/action/issue-action';
 import * as Animatable from 'react-native-animatable';
 function Item(data) {
+  const showStatus = [
+    {label: 'New', value: 'NEW'},
+    {label: 'Cancelled', value: 'CANCELLED'},
+    {label: 'In Progress', value: 'INPROGRESS'},
+  ];
   const changeSubstring = 30;
   const [val, setVal] = React.useState();
   const actionTitle = data.title;
@@ -50,10 +55,12 @@ function Item(data) {
         <View style={{flex: 3, alignItems: 'center', justifyContent: 'center'}}>
           <DropDown
             // id={}
+            data={showStatus}
             onChange={(val) => {
               setVal(val);
               data.onChangeDropDownValue(val);
             }}
+            showStatus={true}
             mode="dialog"
             value={data.status || val}
             containerStyle={{

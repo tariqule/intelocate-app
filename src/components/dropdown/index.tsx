@@ -23,7 +23,7 @@ const DropDown = (props) => {
     setSelected(val);
 
     // props.organization && props.onChange && props.onChange(val, data[index]);
-    !props.showStatus && props.onChange && props.onChange(val);
+    props.showStatus && props.onChange && props.onChange(val);
   };
   const _onChangeOrg = (val, index) => {
     setSelected(val);
