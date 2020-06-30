@@ -7,16 +7,18 @@ import {FormContainer} from '../../../components/FormContainer';
 import {MAIN_BLUE, TEST_BORDER} from '../../../config/global-styles';
 import {LogotypeIcon} from '../../../svg-components/logotype-icon';
 import {Button} from 'react-native-elements';
-import {Link} from '@react-navigation/native';
+import {Link, useNavigation} from '@react-navigation/native';
 import {ACTIVE_BLUE} from '../../../config/global-styles';
 import {forgotPassword} from '../../../services/auth';
+import {SIGN_IN_SCREEN} from '../../../config/navigation-config';
 
 const ResetPassword = () => {
   const [email, setEmail] = React.useState('');
-
+  const navigation = useNavigation();
   const onSubmitEmail = () => {
     forgotPassword(email, (res) => {
-      alert(JSON.stringify(res));
+      navigation.navigate(SIGN_IN_SCREEN);
+      // alert(JSON.stringify(res));
     });
   };
 
