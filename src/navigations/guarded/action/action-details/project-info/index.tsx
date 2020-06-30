@@ -11,6 +11,10 @@ import {
   getCategories,
   getSubCategories,
 } from '../../../../../services/getCategories';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {updateAction} from '../../../../../services/getAction';
+import {selectedAction} from '../../../../../redux/action/issue-action';
 
 const ProjectDetails = (props) => {
   const [categories, setCategories] = React.useState(props.category || []);
@@ -18,6 +22,8 @@ const ProjectDetails = (props) => {
   const [subCategories, setSubCategories] = React.useState(
     props.subCategory || [],
   );
+
+  const dispatch = useDispatch();
 
   const subCategory = true;
   const category = true;
@@ -31,8 +37,13 @@ const ProjectDetails = (props) => {
   React.useEffect(() => {
     getCategories((res) => setCategories(res.data));
   }, []);
-
+  const selected = useSelector((state) => state.issueActon.selectedAction);
   const _onChangeCategory = (val) => {
+    updateAction(selected.id, {categoryId: val}, (res) =>
+      dispatch(selectedAction(res.data)),
+    );
+
+    console.log(val);
     setCatSelected(val);
     getSubCategories(val, (res) =>
       res.data && res.data.length > 0
@@ -47,10 +58,12 @@ const ProjectDetails = (props) => {
           <Text style={styles.categoryText}>Category:</Text>
           <View style={{paddingTop: PADDING_TOP}}>
             <DropDown
+              id={true}
               data={categories}
+              value={selected.category.name}
               style={{width: '100%'}}
               containerStyle={styles.dropDown}
-              onChange={_onChangeCategory}
+              onChange={(val) => _onChangeCategory(val)}
             />
           </View>
         </View>

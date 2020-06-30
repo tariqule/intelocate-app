@@ -31,19 +31,27 @@ const DropDown = (props) => {
         style={[{width: 100, height: 40}, style]}
         selectedValue={props.value || selected}
         onValueChange={_onChangeValue}>
-        {data
-          ? data.map((data) => (
+        {!props.showStatus
+          ? data
+            ? data.map((data) => (
+                <Picker.Item
+                  key={data.id}
+                  label={data.name}
+                  value={props.id ? data.id : data.name}
+                />
+              ))
+            : showStatus.map((data) => (
+                <Picker.Item
+                  label={data.label}
+                  value={data.value}
+                  key={data.label}
+                />
+              ))
+          : data.map((data) => (
               <Picker.Item
                 key={data.id}
-                label={data.name}
-                value={props.id ? data.id : data.name}
-              />
-            ))
-          : showStatus.map((data) => (
-              <Picker.Item
                 label={data.label}
                 value={data.value}
-                key={data.label}
               />
             ))}
       </Picker>

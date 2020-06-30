@@ -2,8 +2,12 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import {FormStyles, FormTextStyles} from '../../../../../config/global-styles';
 import Location from '../../../dashboard/location';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
 
 const LocationInfo = (props) => {
+  const selectedAction = useSelector(
+    (state) => state.issueActon.selectedAction,
+  );
   const {data} = props;
   //   const {} = props.location;
   // const identifier = data.identifier === undefined ? '0' : data.identifier;
@@ -11,11 +15,11 @@ const LocationInfo = (props) => {
   // const countryCode = data.country_code;
   // const cityName = data.country;
   // const address1 = data.address_1;
-  const identifier = '86FA';
-  const name = 'Brooks Fields';
-  const countryCode = 'BAZ';
-  const cityName = 'London';
-  const address1 = '23 Pharmacy ave';
+  const identifier = selectedAction.location.identifier;
+  const name = selectedAction.location.name;
+  const countryCode = selectedAction.location.country_code;
+  const cityName = selectedAction.location.city;
+  const address1 = selectedAction.location.address_1;
   return (
     <View>
       <View style={FormStyles.formRow}>

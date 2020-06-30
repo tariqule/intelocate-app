@@ -1,6 +1,8 @@
 import {AsyncStorage} from 'react-native';
 
 const USER_INFO = '@USER_INFO';
+const QUEUE_STORAGE = '@QUEUE_STORAGE';
+
 const TOKEN = '@TOKEN';
 
 export const storeToken = async (params) => {
@@ -47,6 +49,28 @@ export const retrieveUserInfo = async () => {
     console.log(
       JSON.stringify(item) +
         ' ==> Retrieving data from  [FROM RETRIEVE STORAGE]',
+    );
+    return item;
+  } catch (error) {
+    console.log(error.message);
+  }
+  return;
+};
+
+export const queueStorage = async (params) => {
+  try {
+    await AsyncStorage.setItem(QUEUE_STORAGE, JSON.stringify(params));
+  } catch (error) {
+    console.log(error + ' - ERROR FROM STORAGE');
+  }
+};
+export const retrieveQueueStorage = async () => {
+  try {
+    const retrievedItem = await AsyncStorage.getItem(QUEUE_STORAGE);
+    const item = JSON.parse(retrievedItem);
+    console.log(
+      JSON.stringify(item) +
+        ' ==> Retrieving data from  [FROM RETRIEVE STORAGE] [retrieveQueueStorage]',
     );
     return item;
   } catch (error) {

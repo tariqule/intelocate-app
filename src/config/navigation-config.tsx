@@ -26,7 +26,7 @@ function Navigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={DASHBOARD}
+        initialRouteName={SIGN_IN_SCREEN}
         screenOptions={{
           headerShown: false,
         }}>

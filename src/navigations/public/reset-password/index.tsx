@@ -9,10 +9,16 @@ import {LogotypeIcon} from '../../../svg-components/logotype-icon';
 import {Button} from 'react-native-elements';
 import {Link} from '@react-navigation/native';
 import {ACTIVE_BLUE} from '../../../config/global-styles';
+import {forgotPassword} from '../../../services/auth';
+
 const ResetPassword = () => {
   const [email, setEmail] = React.useState('');
 
-  const onSubmitEmail = () => {};
+  const onSubmitEmail = () => {
+    forgotPassword(email, (res) => {
+      alert(JSON.stringify(res));
+    });
+  };
 
   return (
     <FormContainer>
@@ -48,7 +54,8 @@ const ResetPassword = () => {
 
         <View style={{top: '5%', width: '100%'}}>
           <Button
-            title="Sign in"
+            onPress={onSubmitEmail}
+            title="Reset password"
             disabled={email ? false : true}
             buttonStyle={{backgroundColor: ACTIVE_BLUE}}
           />

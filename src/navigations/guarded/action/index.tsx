@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  RefreshControl,
+  Alert,
 } from 'react-native';
 import HeaderComponent from '../../../components/header';
 import {NavigationDashboardIcon} from '../../../svg-components/navigation-dashboard';
@@ -24,25 +26,15 @@ import {NavigationActionsIcon} from '../../../svg-components/navigation-actions'
 import {ACTION_INFO} from '../../../config/navigation-config';
 import {getAction} from '../../../services/getAction';
 import {IconByCode} from '../../../svg-components/categories-icons/index';
+import OfflineMode from '../../../components/offline';
+import {selectedAction} from '../../../redux/action/issue-action';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
+import {offline_action_list} from '../../../redux/action/offline';
+import {ScrollView} from 'react-native-gesture-handler';
 const index = () => {
   const navigation = useNavigation();
 
-  const actionData = [
-    {
-      title: 'Audit Fenwick Brackell',
-      name: 'Fenwick Bracknell',
-      actionNumber: 'Action #032332',
-      created: '2/4/2020',
-      status: 'NEW',
-    },
-    {
-      title: 'Leaking Unit Canary Wharf',
-      name: 'Fenwick Bracknell',
-      actionNumber: 'Action #032332',
-      created: '2/2/2020',
-      status: 'PENDING APPROVAL',
-    },
-  ];
   const CardItem = (item) => (
     <TouchableOpacity onPress={item.onPress}>
       <Card style={{flex: 1}}>
@@ -105,22 +97,34 @@ const index = () => {
     </TouchableOpacity>
   );
 
-  const [dbActionData, setDbActionData] = React.useState([]);
+  const isConnected = useSelector((state) => state.network.isConnected);
+  const offlineActionList = useSelector(
+    (state) => state.reportIssue.offlineAllActionList,
+  );
+
+  const [dbActionData, setDbActionData] = React.useState(offlineActionList);
   const [isLoading, setIsLoading] = React.useState(false);
   const [count, setCount] = React.useState(2609);
+  const [refreshing, setRefreshing] = React.useState(false);
+
   const getActionsParams = {
     index: 0,
-    count: count,
+    // count: count,
     sort: 'recently_updated_desc',
   };
 
   React.useEffect(() => {
-    setIsLoading(true);
-    getAction(getActionsParams, (response) => {
-      console.log(JSON.stringify(response));
-      setDbActionData(response.data);
-      setIsLoading(false);
-    });
+    if (isConnected) {
+      setIsLoading(true);
+      getAction(getActionsParams, (response) => {
+        console.log(JSON.stringify(response));
+        dispatch(offline_action_list(response.data));
+        setDbActionData(response.data);
+        setIsLoading(false);
+      });
+    } else {
+      console.warn('You are currently viewing offline.');
+    }
   }, []);
 
   const showStatus = [
@@ -129,6 +133,18 @@ const index = () => {
     {label: 'IN PROGRESS', value: 'INPROGRESS'},
   ];
 
+  const _onRefresh = () => {
+    if (isConnected) {
+      setRefreshing(true);
+      getAction(getActionsParams, (response) => {
+        console.log(JSON.stringify(response));
+        setDbActionData(response.data);
+        setRefreshing(false);
+      });
+    } else {
+      Alert.alert('Offline Mode', 'You are currently viewing offline.');
+    }
+  };
   function getStatus(input) {
     if (showStatus.length) {
       var v = showStatus.filter(function (element) {
@@ -138,34 +154,50 @@ const index = () => {
       else return null;
     } else return null;
   }
+  const dispatch = useDispatch();
+
   return (
     <View style={{backgroundColor: COLOR_BORDER, flex: 1}}>
+      <OfflineMode />
       <HeaderComponent
         title={`Actions (${count})`}
         icon={<NavigationActionsIcon />}
         onLogoPress={() => navigation.dispatch(DrawerActions.openDrawer())}
       />
       {isLoading === false ? (
-        <FlatList
-          data={dbActionData}
-          renderItem={({item}) => (
-            <CardItem
-              title={item.name}
-              name={item.location !== undefined ? item.location.name : ''}
-              actionNumber={item.issueNumber}
-              created={item.createdAt}
-              status={getStatus(item.status)}
-              iconCode={
-                item.category &&
-                item.category.iconCode && {
-                  code: item.category.iconCode,
-                  color: MAIN_GRAY,
+        <ScrollView
+          nestedScrollEnabled={true}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={_onRefresh}></RefreshControl>
+          }>
+          <FlatList
+            data={dbActionData}
+            renderItem={({item}) => (
+              <CardItem
+                key={item.id}
+                title={item.name}
+                name={item.location !== undefined ? item.location.name : ''}
+                actionNumber={item.issueNumber}
+                created={item.createdAt}
+                status={getStatus(item.status)}
+                iconCode={
+                  item.category &&
+                  item.category.iconCode && {
+                    code: item.category.iconCode,
+                    color: MAIN_GRAY,
+                  }
                 }
-              }
-              onPress={() => navigation.navigate(ACTION_INFO, {item})}
-            />
-          )}
-          keyExtractor={(item) => item.id}></FlatList>
+                onPress={() => {
+                  console.log(JSON.stringify(item));
+                  dispatch(selectedAction(item));
+                  navigation.navigate(ACTION_INFO, {item});
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.id}></FlatList>
+        </ScrollView>
       ) : (
         <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
           <ActivityIndicator size={'large'} />

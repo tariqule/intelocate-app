@@ -16,15 +16,48 @@ import {TextInput} from 'react-native-gesture-handler';
 import {Input} from 'react-native-elements';
 
 import DatePicker from '../../../../../components/date-picker';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
+import {updateAction} from '../../../../../services/getAction';
+import {onChange} from 'react-native-reanimated';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {selectedAction} from '../../../../../redux/action/issue-action';
 
 export const PADDING_TOP = 10;
 
 const ActionStatus = () => {
+  const showStatus = [
+    {label: 'New', value: 'NEW'},
+    {label: 'Cancelled', value: 'CANCELLED'},
+    {label: 'In Progress', value: 'INPROGRESS'},
+  ];
   const [statusText, setStatusText] = React.useState();
   const [subStatus, setSubStatus] = React.useState('');
+  const [changedValue, setChangedValue] = React.useState('');
 
   const _onChangeSubStatus = (val) => {
     setSubStatus(val);
+  };
+  const selected = useSelector((state) => state.issueActon.selectedAction);
+  const dispatch = useDispatch();
+  const _onChange = (val) => {
+    setChangedValue(val);
+    updateAction(selected.id, {status: val}, (res) =>
+      dispatch(selectedAction(res.data)),
+    );
+  };
+  React.useEffect(() => {
+    console.log(selected.startDate);
+  }, []);
+  const _onChangeStartDate = (date) => {
+    // setChangedValue(val);
+    updateAction(selected.id, {startDate: date}, (res) =>
+      dispatch(selectedAction(res.data)),
+    );
+  };
+  const _onChangeEndDate = (date) => {
+    updateAction(selected.id, {dueDate: date}, (res) =>
+      dispatch(selectedAction(res.data)),
+    );
   };
   return (
     <View style={{}}>
@@ -53,9 +86,12 @@ const ActionStatus = () => {
         <Text style={styles.priorityText}>Overall Status:</Text>
         <View style={{paddingTop: PADDING_TOP}}>
           <DropDown
+            value={selected.status || changedValue}
+            data={showStatus}
+            showStatus={true}
             style={{width: '100%'}}
             containerStyle={styles.dropDown}
-            onChange={(val) => console.log(val)}
+            onChange={(val) => _onChange(val)}
           />
         </View>
       </View>
@@ -74,13 +110,19 @@ const ActionStatus = () => {
       <View style={{}}>
         <Text style={styles.priorityText}>Start Date:</Text>
         <View style={{}}>
-          <DatePicker onChange={(date) => console.log(date)} />
+          <DatePicker
+            onChange={(date) => _onChangeStartDate(date)}
+            defaultDate={selected.startDate}
+          />
         </View>
       </View>
       <View style={{paddingTop: PADDING_TOP}}>
         <Text style={styles.priorityText}>End Date:</Text>
         <View style={{paddingBottom: PADDING_TOP}}>
-          <DatePicker onChange={(date) => console.log(date)} />
+          <DatePicker
+            onChange={(date) => _onChangeEndDate(date)}
+            defaultDate={selected.dueDate}
+          />
         </View>
       </View>
     </View>

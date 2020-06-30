@@ -5,6 +5,7 @@ import {ACTIVE_BLUE} from '../../config/global-styles';
 interface datePickerProps {
   onChange: (date) => void;
   disabled?: boolean;
+  defaultDate?: any;
 }
 
 const DatePickerComponent = (props: datePickerProps) => {
@@ -14,7 +15,7 @@ const DatePickerComponent = (props: datePickerProps) => {
   };
   return (
     <DatePicker
-      defaultDate={new Date(2018, 4, 4)}
+      defaultDate={props.defaultDate}
       minimumDate={new Date(2018, 1, 1)}
       maximumDate={new Date(2018, 12, 31)}
       locale={'en'}

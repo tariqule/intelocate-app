@@ -209,7 +209,13 @@ PODS:
     - React
   - react-native-maps (0.27.1):
     - React
+  - react-native-netinfo (5.9.4):
+    - React
+  - react-native-nfc-manager (2.1.9):
+    - React
   - react-native-safe-area-context (3.0.5):
+    - React
+  - react-native-viewpager (4.0.1):
     - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
@@ -280,7 +286,10 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - "react-native-viewpager (from `../node_modules/@react-native-community/viewpager`)"
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -339,8 +348,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-maps"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
+  react-native-nfc-manager:
+    :path: "../node_modules/react-native-nfc-manager"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-viewpager:
+    :path: "../node_modules/@react-native-community/viewpager"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -396,7 +411,10 @@ SPEC CHECKSUMS:
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
   react-native-google-maps: 0a989abda71059db2caa98b9dacca7a8f38a47d0
   react-native-maps: f4b89da81626ad7f151a8bfcb79733295d31ce5c
+  react-native-netinfo: eed0fb1d6a9424e98ce686f92aad62ff427d4bc9
+  react-native-nfc-manager: bf739e039e2888b82d6c8faaee39c9582db2bfab
   react-native-safe-area-context: e9a863c2dbbc0d42d2b12209d63fa79dfbc9662c
+  react-native-viewpager: 5ff156ac42630c0c7275bf5fb95c259b90c5ff6f
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -415,6 +433,6 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: c958e2225cb792d1b5ecf03db0619f34bfa47425
+PODFILE CHECKSUM: 10f2e089e4e61edc6f61fe4a334eb22db49640ba
 
 COCOAPODS: 1.9.0.beta.3

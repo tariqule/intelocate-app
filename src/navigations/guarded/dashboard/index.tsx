@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -46,6 +48,16 @@ import {Modal_PopUp} from '../../../components/popup';
 import {_NfcOn, _cleanUp} from '../../../components/nfc';
 import * as Animatable from 'react-native-animatable';
 import {getUserByNfc} from '../../../services/nfc';
+import {NetworkConsumer, checkInternetConnection} from 'react-native-offline';
+import {OfflineModeIcon} from '../../../svg-components/offline-mode-icon';
+import OfflineMode from '../../../components/offline';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {
+  report_issue_fn,
+  clear_queue,
+  offline_category_list,
+} from '../../../redux/action/offline';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
 const dataArray = [
   {
     title: 'Announcements:',
@@ -106,9 +118,41 @@ const dashboard = () => {
   const [showPopup, setShowPopup] = React.useState(false);
   const [IssueNumber, setIssueNumber] = React.useState('');
   // const [nfcId, setNfcId] = React.useState();
-
+  const [refreshComponent, setRefreshComponent] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshingCom, setRefreshingCom] = React.useState(false);
   //etag
   const [etagLocationId, setEtagLocationId] = React.useState('');
+
+  const offlineQueuedData = useSelector(
+    (state) => state.reportIssue.offlineData,
+  );
+  const isConnected = useSelector((state) => state.network.isConnected);
+
+  const submitIssueResponse = useSelector(
+    (state) =>
+      state.reportIssue.responseData &&
+      state.reportIssue.responseData.map((e) => e.issueNumber),
+  );
+
+  const dispatch = useDispatch();
+
+  const newLocal_1 = '[DASHBOARD] [REPORT_ISSUE_RESPONSE]';
+
+  React.useEffect(() => {
+    console.log(JSON.stringify(submitIssueResponse) + newLocal_1);
+
+    if (isConnected && offlineQueuedData) {
+      // setEtagLocationId('Tag');
+      refreshComponent ? setRefreshComponent(false) : setRefreshComponent(true);
+      retrieveUserInfo().then((res) => {
+        dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
+      });
+    }
+
+    const newLocal = '[DASHBOARD] => offline queued items';
+    console.log(JSON.stringify(offlineQueuedData) + newLocal);
+  }, []);
 
   const _handleBack = () => {
     _cleanUp();
@@ -117,34 +161,55 @@ const dashboard = () => {
 
   const _handleReportIssueButton = () => {
     setModalVisibility(true);
-    _NfcOn((res) => {
-      getUserByNfc(res, (res) => {
-        Alert.alert('NFC tag found!', res);
-        setEtagLocationId(res);
-      });
-      // setNfcId(res);
-    });
     setHeaderTitleState('Log Issue');
+  };
+  const _onRefresh = () => {
+    setRefreshingCom(true);
+    // alert(isConnected);
+    if (isConnected) {
+      // setEtagLocationId('Tag');
+
+      // refreshComponent ? setRefreshComponent(false) : setRefreshComponent(true);
+      retrieveUserInfo().then((res) => {
+        dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
+        setRefreshingCom(false);
+      });
+    } else Alert.alert('Offline Mode', 'You are currently offline.');
   };
   return (
     <Container
       style={{
         top: Platform.select({android: '0%', ios: '4.2%'}),
       }}>
+      <OfflineMode />
+
       <HeaderComponent
         title="Dashboard"
         icon={<NavigationDashboardIcon />}
         onLogoPress={() => navigation.dispatch(DrawerActions.openDrawer())}
       />
-      <Content padder style={{backgroundColor: COLOR_BORDER}}>
-        <Accordion
-          dataArray={dataArray}
-          animation={true}
-          expanded={true}
-          renderHeader={_renderHeader}
-          renderContent={_renderContent}
-        />
-      </Content>
+      {!refreshing ? (
+        <Content
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshingCom}
+              onRefresh={_onRefresh}></RefreshControl>
+          }
+          padder
+          style={{backgroundColor: COLOR_BORDER}}>
+          <Accordion
+            dataArray={dataArray}
+            animation={true}
+            expanded={true}
+            renderHeader={_renderHeader}
+            renderContent={_renderContent}
+          />
+        </Content>
+      ) : (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
 
       <ActionButton
         buttonColor={ACTIVE_BLUE}
@@ -161,22 +226,21 @@ const dashboard = () => {
         modalVisible={modalVisibility}
         onPressBackButton={_handleBack}
         headerTitle={headerTitleState}
-        didSubmit={(submitted, issueNumber) => {
+        didSubmit={(submitted) => {
           setShowPopup(submitted);
-          console.log(issueNumber);
-          setIssueNumber(issueNumber);
+          // console.log(issueNumber);
+          // setIssueNumber(issueNumber);
         }}
-        nfcLocationId={etagLocationId}
+        // nfcLocationId={etagLocationId}
+        loading={(refreshing) => setRefreshing(refreshing)}
       />
       {showPopup && (
         <Modal_PopUp
           isVisible={showPopup}
           title="Issue Submitted"
-          issueNumber={`Issue #${IssueNumber}`}
+          issueNumber={`Issue #${submitIssueResponse}`}
           onPress={() => setShowPopup(false)}></Modal_PopUp>
       )}
-
-      {/* <Navigation opened={true} hide={() => {}} /> */}
     </Container>
   );
 };
@@ -190,8 +254,9 @@ interface actionModalProps {
   modalVisible: boolean;
   onPressBackButton: () => void;
   headerTitle: string;
-  didSubmit?: (boolean, IssueNumber) => void;
-  nfcLocationId: string;
+  didSubmit?: (boolean) => void;
+  nfcLocationId?: string;
+  loading?: (boolean) => void;
 }
 const ActionModal = (props: actionModalProps) => {
   const [organization, setOrganization] = React.useState([]);
@@ -213,18 +278,46 @@ const ActionModal = (props: actionModalProps) => {
 
   //after submitting
   const [showPopup, setShowPopup] = React.useState(true);
-  const [IssueNumber, setIssueNumber] = React.useState('');
+
+  //nfc
+  const [etagLocationId, setEtagLocationId] = React.useState('');
+
+  //redux
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
-    getCategories((res) => setCategories(res.data));
+    _NfcOn((res) => {
+      getUserByNfc(res, (res) => {
+        Alert.alert('NFC tag found!', res);
+        setEtagLocationId(res.organizationId);
+        getListOrganizationWithLocation(
+          res.organizationId,
+          'CREATE_PROJECT',
+          (resOrg) => {
+            getListTenantsWithLocation((resTenants) => {
+              setOrganization([...resOrg.data, ...resTenants.data]);
+            });
+          },
+        );
+      });
 
-    getExternalUsers((res) => setExternalUsers(res.users));
+      // setNfcId(res);
+    });
+
+    getCategories((res) => {
+      dispatch(offline_category_list(res.data));
+      setCategories(res.data);
+    });
+
+    getExternalUsers((res) => {
+      setExternalUsers(res.users);
+    });
 
     retrieveUserInfo().then((res) => {
       setUserOrganization(res.organization.id);
 
       getListOrganizationWithLocation(
-        res.organization.tenantId,
+        res.organization.id,
         'CREATE_PROJECT',
         (resOrg) => {
           getListTenantsWithLocation((resTenants) => {
@@ -307,6 +400,11 @@ const ActionModal = (props: actionModalProps) => {
     setExternalCreatorId(val);
   };
 
+  const isConnected = useSelector((state) => state.network.isConnected);
+  const submitIssueResponse = useSelector(
+    (state) => state.reportIssue.responseData,
+  );
+
   const _onPressSubmit = () => {
     const task = {
       categoryId: selectedCategoryId,
@@ -315,25 +413,45 @@ const ActionModal = (props: actionModalProps) => {
       name: selectedCategoryIssue,
       status: 'NEW',
     };
-    sendIssue(
-      useOrganizationID,
-      {
-        tasks: [JSON.stringify(task)],
-      },
-      (res) => {
-        setShowPopup(true);
-        // setIssueNumber();
-        console.log(JSON.stringify(res));
 
-        props.didSubmit(
-          true,
-          res.data.map((d) => d.issueNumber),
-        );
-        props.onPressBackButton();
-      },
+    dispatch(
+      report_issue_fn(useOrganizationID, {
+        tasks: [JSON.stringify(task)],
+      }),
     );
+    props.onPressBackButton();
+    if (!isConnected) {
+      Alert.alert('', 'Issue submission is queued!');
+    } else {
+      props.loading(true);
+      setTimeout(() => {
+        props.loading(false);
+        setShowPopup(true);
+
+        props.didSubmit(true);
+      }, 5000);
+    }
+
+    // sendIssue(
+    //   useOrganizationID,
+    //   {
+    //     tasks: [JSON.stringify(task)],
+    //   },
+    //   (res) => {
+    //     setShowPopup(true);
+    //     // setIssueNumber();
+    //     console.log(JSON.stringify(res));
+
+    //     props.didSubmit(
+    //       true,
+    //       res.data.map((d) => d.issueNumber),
+    //     );
+    //     props.onPressBackButton();
+    //   },
+    // );
   };
   const ref = React.createRef();
+
   return (
     <Modal
       animationType="slide"
@@ -342,6 +460,7 @@ const ActionModal = (props: actionModalProps) => {
       visible={props.modalVisible}
       onRequestClose={props.onPressBackButton}>
       <Container style={{flex: 1}}>
+        <OfflineMode />
         <Header
           containerStyle={[
             {

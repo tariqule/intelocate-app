@@ -15,7 +15,7 @@ import {
   ACTION,
 } from '../../config/navigation-config';
 import {useNavigation} from '@react-navigation/native';
-import {retrieveUserInfo} from '../../services/local-storage';
+import {retrieveUserInfo, storeToken} from '../../services/local-storage';
 
 //TODO: get the user using redux to
 export function DrawerContent() {
@@ -35,6 +35,7 @@ export function DrawerContent() {
   }, []);
 
   const _signOut = () => {
+    // storeToken('').then(())
     navigation.navigate(SIGN_IN_SCREEN);
   };
   const _dashboard = () => {

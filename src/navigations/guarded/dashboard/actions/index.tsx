@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {Divider} from 'react-native-elements';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -22,7 +23,9 @@ import {getAction, updateAction} from '../../../../services/getAction';
 import {getCurrentUser} from '../../../../services/getUser';
 import {useNavigation} from '@react-navigation/native';
 import {ACTION_INFO} from '../../../../config/navigation-config';
-
+import {useDispatch} from 'react-redux';
+import {offline_action_list} from '../../../../redux/action/offline';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
 function Item(data) {
   const changeSubstring = 30;
   const [val, setVal] = React.useState();
@@ -104,21 +107,34 @@ function headerComponent() {
 }
 const Action = () => {
   const navigation = useNavigation();
-  const [dbActionData, setDbActionData] = React.useState([]);
+  const isConnected = useSelector((state) => state.network.isConnected);
+  const offlineActionList = useSelector(
+    (state) => state.reportIssue.offlineAllActionList,
+  );
+
+  const [dbActionData, setDbActionData] = React.useState(offlineActionList);
   const [dropDownValue, setDropDownValue] = React.useState('');
   const [refreshing, setRefreshing] = React.useState(false);
 
   const getActionsParams = {
     index: 0,
-    count: 100,
     sort: 'recently_updated_desc',
   };
 
+  const dispatch = useDispatch();
   React.useEffect(() => {
-    getAction(getActionsParams, (response) => {
-      console.log(JSON.stringify(response));
-      setDbActionData(response.data);
-    });
+    if (isConnected) {
+      setRefreshing(true);
+      getAction(getActionsParams, (response) => {
+        console.log(JSON.stringify(response));
+        dispatch(offline_action_list(response.data));
+        setDbActionData(response.data);
+
+        setRefreshing(false);
+      });
+    } else {
+      Alert.alert('Offline Mode', 'You are currently viewing offline.');
+    }
   }, []);
 
   const _onPressDropdown = (item) => {
@@ -135,32 +151,37 @@ const Action = () => {
   };
   return (
     <ScrollView nestedScrollEnabled={true} style={{height: 350}}>
-      <FlatList
-        data={dbActionData}
-        renderItem={({item}) => (
-          <Item
-            key={item.id}
-            title={item.name}
-            status={item.status}
-            onPressAction={() => navigation.navigate(ACTION_INFO, {item})}
-            // onPressDropDown={() => _onPressDropdown(item)}
-            onChangeDropDownValue={(val) => {
-              console.log(val + ' => Changed val');
-              updateAction(item.id, {status: val}, (res) => {
-                getAction(getActionsParams, (response) => {
-                  console.log(JSON.stringify(response));
-                  setDbActionData(response.data);
+      {!refreshing ? (
+        <FlatList
+          data={dbActionData}
+          renderItem={({item}) => (
+            <Item
+              key={item.id}
+              title={item.name}
+              status={item.status}
+              onPressAction={() => navigation.navigate(ACTION_INFO, {item})}
+              // onPressDropDown={() => _onPressDropdown(item)}
+              onChangeDropDownValue={(val) => {
+                console.log(val + ' => Changed val');
+                updateAction(item.id, {status: val}, (res) => {
+                  getAction(getActionsParams, (response) => {
+                    console.log(JSON.stringify(response));
+                    setDbActionData(response.data);
+                  });
                 });
-              });
-              setDropDownValue(val);
-            }}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={headerComponent}
-        ListHeaderComponentStyle={{height: 40}}
-        nestedScrollEnabled={true}
-      />
+                setDropDownValue(val);
+              }}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={headerComponent}
+          ListHeaderComponentStyle={{height: 40}}
+          nestedScrollEnabled={true}
+          refreshing={true}
+        />
+      ) : (
+        <ActivityIndicator />
+      )}
     </ScrollView>
   );
 };

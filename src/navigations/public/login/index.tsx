@@ -15,7 +15,11 @@ import {Link, useNavigation} from '@react-navigation/native';
 
 import {RESET_SCREEN, DASHBOARD} from '../../../config/navigation-config';
 import {signin} from '../../../services/auth';
-import {storeUserInfo, storeToken} from '../../../services/local-storage';
+import {
+  storeUserInfo,
+  storeToken,
+  getToken,
+} from '../../../services/local-storage';
 import NetInfo from '@react-native-community/netinfo';
 
 export default () => {
@@ -24,10 +28,15 @@ export default () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [shouldDisableButton, setShouldDisableButton] = React.useState(true);
-
+  const [userLoggedIn, setUserLoggedIn] = React.useState(false);
   const onSubmitEmail = () => {};
   const onSubmitPassword = () => {};
 
+  React.useEffect(() => {
+    getToken().then((res) => {
+      res && navigation.navigate(DASHBOARD);
+    });
+  }, []);
   const _onPressSubmit = () => {
     signin(
       email,
