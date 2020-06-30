@@ -19,6 +19,8 @@ export const OFFLINE_SUB_CATEGORY_LIST = 'OFFLINE_SUB_CATEGORY_LIST';
 
 export const OFFLINE_ORGANIZATION_LIST = 'OFFLINE_ORGANIZATION_LIST';
 export const OFFLINE_ORGANIZATION_LOCATION = 'OFFLINE_ORGANIZATION_LOCATION';
+export const OFFLINE_EXTERNAL_USER_LOCATION = 'OFFLINE_EXTERNAL_USER_LOCATION';
+export const OFFLINE_ORGANIZATION = 'OFFLINE_ORGANIZATION';
 
 type ActionToBeQueued = {
   type: string;
@@ -63,6 +65,14 @@ export const offline_organization_list = (actionData: any) => ({
 });
 export const offline_organizaton_location_list = (actionData: any) => ({
   type: OFFLINE_ORGANIZATION_LOCATION,
+  payload: actionData,
+});
+export const offline_external_user_list = (actionData: any) => ({
+  type: OFFLINE_EXTERNAL_USER_LOCATION,
+  payload: actionData,
+});
+export const offline_organizations = (actionData: any) => ({
+  type: OFFLINE_ORGANIZATION,
   payload: actionData,
 });
 

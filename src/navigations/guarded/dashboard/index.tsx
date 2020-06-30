@@ -11,6 +11,7 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -56,8 +57,14 @@ import {
   report_issue_fn,
   clear_queue,
   offline_category_list,
+  offline_organization_list,
+  offline_organizaton_location_list,
+  offline_external_user_list,
+  offline_organizations,
 } from '../../../redux/action/offline';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
+import {getOfflineOrganizations} from '../../../services/offline';
+
 const dataArray = [
   {
     title: 'Announcements:',
@@ -143,7 +150,10 @@ const dashboard = () => {
     console.log(JSON.stringify(submitIssueResponse) + newLocal_1);
 
     if (isConnected && offlineQueuedData) {
+      /**@ONLY.OFFLINE**/
+      getOfflineOrganizations((res) => dispatch(offline_organizations(res)));
       // setEtagLocationId('Tag');
+
       refreshComponent ? setRefreshComponent(false) : setRefreshComponent(true);
       retrieveUserInfo().then((res) => {
         dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
@@ -221,7 +231,7 @@ const dashboard = () => {
           <Icon name="md-create" style={styles.actionButtonIcon} />
         </ActionButton.Item>
       </ActionButton>
-      {/* <FloatingActionButton onPress={_handleFloatingActionPress} /> */}
+
       <ActionModal
         modalVisible={modalVisibility}
         onPressBackButton={_handleBack}
@@ -259,14 +269,48 @@ interface actionModalProps {
   loading?: (boolean) => void;
 }
 const ActionModal = (props: actionModalProps) => {
-  const [organization, setOrganization] = React.useState([]);
-  const [categories, setCategories] = React.useState([]);
-  const [subCategories, setSubCategories] = React.useState([]);
+  const offlineCategories = useSelector(
+    (state) => state.reportIssue.offlineCategories,
+  );
+  const offlineSubCategories = useSelector(
+    (state) => state.reportIssue.offlineSubCategories,
+  );
+  const offlineOrganizationList = useSelector(
+    (state) => state.reportIssue.offlineOrganizationList,
+  );
+  const offlineOrganizationLocationList = useSelector(
+    (state) => state.reportIssue.offlineOrganizationLocationList,
+  );
+  const offlineExternalUsersList = useSelector(
+    (state) => state.reportIssue.offlineExternalUsersList,
+  );
+
+  const offlineOrganizationsPacketData = useSelector(
+    (state) => state.reportIssue.offlineOrganizations,
+  );
+
+  const isConnected = useSelector((state) => state.network.isConnected);
+
+  const [organization, setOrganization] = React.useState(
+    offlineOrganizationList ? offlineOrganizationList : [],
+  );
+  const [categories, setCategories] = React.useState(
+    offlineCategories ? offlineCategories : [],
+  );
+  const [subCategories, setSubCategories] = React.useState(
+    offlineSubCategories ? offlineSubCategories : [],
+  );
   const [categoriesIssue, setCategoriesIssue] = React.useState([]);
-  const [userLocations, setUserLocations] = React.useState([]);
+  const [userLocations, setUserLocations] = React.useState(
+    offlineOrganizationLocationList ? offlineOrganizationLocationList : [],
+  );
   const [selectedIconColor, setIconSelectedColor] = React.useState(MAIN_GRAY);
   const [selectedCategory, setSelectedCategory] = React.useState([]);
-  const [externalUsers, setExternalUsers] = React.useState([]);
+  const [externalUsers, setExternalUsers] = React.useState(
+    offlineExternalUsersList
+      ? offlineExternalUsersList
+      : offlineExternalUsersList,
+  );
 
   //organization id
   const [useOrganizationID, setUserOrganization] = React.useState('');
@@ -304,12 +348,67 @@ const ActionModal = (props: actionModalProps) => {
       // setNfcId(res);
     });
 
+    // !isConnected &&
+    //   setOrganization(
+    //     offlineOrganizationsPacketData.map((e) => {
+    //       let tenantName = e && e.name;
+    //       let ienantId = e & e.id;
+    //       let _locationsId = e._location && e._location.map((v) => v.id);
+    //       let _locationName = e._location && e._location.map((n) => n.name);
+    //       let tenant = [{name: tenantName, id: ienantId}];
+    //       let _location = [{name: _locationName, id: _locationsId}];
+
+    //       return [...tenant, ..._location];
+    //     }),
+    //   );
+    //tenant
+    // offlineOrganizationsPacketData.map((e) => {
+    //   return {id: e.id, name: e.name};
+    // }),
+    //org
+    // offlineOrganizationsPacketData
+    //       .map((e) => {
+    //         return e._organizations.map((v) => {
+    //           return {id: v.id, name: v.name, locations: v._locations};
+    //         });
+    //       })
+    //       .flatMap((e) => e)
+    if (!isConnected) {
+      setOrganization(
+        offlineOrganizationsPacketData.map((e) => {
+          let mapOrg = e._organizations
+            .map((v) => {
+              return {id: v.id, name: v.name, locations: v._locations};
+            })
+            .flatMap((e) => e);
+
+          let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
+          return [...mapOrg, ...mapTenant];
+        })[0],
+      );
+    }
+    console.log(
+      JSON.stringify(
+        offlineOrganizationsPacketData.map((e) => {
+          let mapOrg = e._organizations
+            .map((v) => {
+              return {id: v.id, name: v.name, locations: v._locations};
+            })
+            .flatMap((e) => e);
+
+          let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
+          return [...mapOrg, ...mapTenant];
+        })[0],
+      ) + '@Here in now',
+    );
+
     getCategories((res) => {
       dispatch(offline_category_list(res.data));
       setCategories(res.data);
     });
 
     getExternalUsers((res) => {
+      dispatch(offline_external_user_list(res.users));
       setExternalUsers(res.users);
     });
 
@@ -321,6 +420,9 @@ const ActionModal = (props: actionModalProps) => {
         'CREATE_PROJECT',
         (resOrg) => {
           getListTenantsWithLocation((resTenants) => {
+            dispatch(
+              offline_organization_list([...resOrg.data, ...resTenants.data]),
+            );
             setOrganization([...resOrg.data, ...resTenants.data]);
           });
 
@@ -392,15 +494,23 @@ const ActionModal = (props: actionModalProps) => {
     // );
   };
   //
-  const _onChangeOrganization = (val) => {
-    getListLocationByOrganization(val, (res) => setUserLocations(res.data));
+  const _onChangeOrganization = (val, data) => {
+    // console.log(JSON.stringify(data) + ' ====> pressed data');
+    if (isConnected) {
+      getListLocationByOrganization(val, (res) => {
+        // offlineOrganizationList(res.data);
+        dispatch(offline_organizaton_location_list(res.data));
+        setUserLocations(res.data);
+      });
+    } else {
+      setUserLocations(data.locations);
+    }
     console.log(val);
   };
   const _onChangeExternalUsers = (val) => {
     setExternalCreatorId(val);
   };
 
-  const isConnected = useSelector((state) => state.network.isConnected);
   const submitIssueResponse = useSelector(
     (state) => state.reportIssue.responseData,
   );
@@ -492,8 +602,10 @@ const ActionModal = (props: actionModalProps) => {
             }}>
             <View>
               <Text style={styles.issueTitle}>Organization:</Text>
+
               <DropDownX
-                value={organization.id}
+                // value={organization.id}
+
                 data={organization}
                 // defaultValue={Location}
                 // disabled={true}
@@ -504,7 +616,7 @@ const ActionModal = (props: actionModalProps) => {
                   alignSelf: 'center',
                   borderColor: ACTIVE_BLUE,
                 }}
-                onChange={(val) => _onChangeOrganization(val)}
+                onChange={(val, data) => _onChangeOrganization(val, data)}
                 style={{width: '100%'}}
               />
             </View>
@@ -537,7 +649,7 @@ const ActionModal = (props: actionModalProps) => {
                 />
               </View>
               <View>
-                {subCategories.length > 0 && (
+                {subCategories && subCategories.length > 0 && (
                   <CategoryCard
                     subCategories={true}
                     data={subCategories}

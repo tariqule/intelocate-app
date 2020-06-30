@@ -8,6 +8,8 @@ import {
   OFFLINE_SUB_CATEGORY_LIST,
   OFFLINE_ORGANIZATION_LIST,
   OFFLINE_ORGANIZATION_LOCATION,
+  OFFLINE_EXTERNAL_USER_LOCATION,
+  OFFLINE_ORGANIZATION,
 } from '../../action/offline';
 
 const initialState = {
@@ -18,6 +20,8 @@ const initialState = {
   offlineSubCategories: [],
   offlineOrganizationList: [],
   offlineOrganizationLocationList: [],
+  offlineExternalUsersList: [],
+  offlineOrganizations: [],
 };
 
 const reportIssue = (state = initialState, action) => {
@@ -56,14 +60,40 @@ const reportIssue = (state = initialState, action) => {
         offlineSubCategories: action.payload,
       };
     case OFFLINE_ORGANIZATION_LIST:
+      console.log(
+        JSON.stringify(state.offlineOrganizationList) +
+          ' ===>  From [offlineOrganizationList] [redux] [reducer]',
+      );
       return {
         ...state,
         offlineOrganizationList: action.payload,
       };
     case OFFLINE_ORGANIZATION_LOCATION:
+      console.log(
+        JSON.stringify(state.offlineOrganizationLocationList) +
+          ' ===>  From [offlineOrganizationLocationList] [redux] [reducer]',
+      );
       return {
         ...state,
         offlineOrganizationLocationList: action.payload,
+      };
+    case OFFLINE_EXTERNAL_USER_LOCATION:
+      console.log(
+        JSON.stringify(state.offlineExternalUsersList) +
+          ' ===>  From [External-Users] [redux] [reducer]',
+      );
+      return {
+        ...state,
+        offlineExternalUsersList: action.payload,
+      };
+    case OFFLINE_ORGANIZATION:
+      console.log(
+        JSON.stringify(state.offlineOrganizations) +
+          ' ===>  From [offlineOrganizations] [redux] [reducer]',
+      );
+      return {
+        ...state,
+        offlineOrganizations: action.payload,
       };
 
     default:

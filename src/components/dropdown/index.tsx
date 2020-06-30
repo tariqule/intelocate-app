@@ -19,9 +19,9 @@ const DropDown = (props) => {
     {label: 'In Progress', value: 'INPROGRESS'},
   ];
 
-  const _onChangeValue = (val) => {
+  const _onChangeValue = (val, index) => {
     setSelected(val);
-    props.onChange && props.onChange(val);
+    props.onChange && props.onChange(val, data[index]);
   };
   return (
     <Form style={containerStyle}>
