@@ -39,7 +39,8 @@ export function DrawerContent() {
     navigation.navigate(SIGN_IN_SCREEN);
   };
   const _dashboard = () => {
-    navigation.navigate(DASHBOARD);
+    navigation.goBack();
+    navigation.goBack();
   };
   const _action = () => {
     navigation.navigate(ACTION);
@@ -68,69 +69,112 @@ export function DrawerContent() {
         backgroundColor: MAIN_BLUE,
       }}>
       <View style={{paddingTop: 15}}>
-        {drawerData.map((data) => (
-          <View>
-            <TouchableOpacity
-              onPress={data.userIcon ? () => toggleUser() : data.onPress}>
+        <View>
+          <TouchableOpacity onPress={() => toggleUser()}>
+            <View
+              style={{
+                flexDirection: 'row',
+
+                alignItems: 'center',
+
+                borderWidth: TEST_BORDER,
+                paddingLeft: 10,
+              }}>
               <View
                 style={{
-                  flexDirection: 'row',
-
+                  backgroundColor: MAIN_DARK_ORANGE,
+                  height: 20,
+                  width: 20,
+                  borderRadius: 100,
+                  borderColor: '#fff',
+                  borderWidth: 1,
+                  justifyContent: 'center',
                   alignItems: 'center',
-
-                  borderWidth: TEST_BORDER,
-                  paddingLeft: 10,
                 }}>
-                {data.userIcon && (
-                  <View
-                    style={{
-                      backgroundColor: MAIN_DARK_ORANGE,
-                      height: 20,
-                      width: 20,
-                      borderRadius: 100,
-                      borderColor: '#fff',
-                      borderWidth: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{color: '#fff', fontSize: 8}}>{ab}</Text>
-                  </View>
-                )}
-                {!data.userIcon && (
-                  <Icon
-                    name={data.icon}
-                    type="MaterialIcons"
-                    style={{color: '#fff'}}></Icon>
-                )}
+                <Text style={{color: '#fff', fontSize: 8}}>{ab}</Text>
+              </View>
 
-                <View style={{padding: 10}}>
-                  <Text
-                    style={{
-                      color: '#FFF',
-                      fontSize: font_sm,
-                      fontWeight: data.userIcon && 'bold',
-                    }}>
-                    {data.title}
-                  </Text>
-                </View>
+              <View style={{padding: 10}}>
+                <Text
+                  style={{
+                    color: '#FFF',
+                    fontSize: font_sm,
+                    fontWeight: 'bold',
+                  }}>
+                  {user}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          {toogle && (
+            <TouchableOpacity onPress={_signOut}>
+              <View style={{padding: 10}}>
+                <Text style={{color: '#fff', fontSize: font_sm}}>Sign Out</Text>
               </View>
             </TouchableOpacity>
+          )}
 
-            {data.userIcon &&
-              toogle &&
-              userData.map((data) => (
-                <TouchableOpacity onPress={data.onPress}>
-                  <View style={{padding: 10}}>
-                    <Text style={{color: '#fff', fontSize: font_sm}}>
-                      {data.title}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+          <Divider />
+        </View>
 
-            {data.userIcon && <Divider />}
-          </View>
-        ))}
+        <View>
+          <TouchableOpacity onPress={_dashboard}>
+            <View
+              style={{
+                flexDirection: 'row',
+
+                alignItems: 'center',
+
+                borderWidth: TEST_BORDER,
+                paddingLeft: 10,
+              }}>
+              <Icon
+                name={'dashboard'}
+                type="MaterialIcons"
+                style={{color: '#fff'}}></Icon>
+
+              <View style={{padding: 10}}>
+                <Text
+                  style={{
+                    color: '#FFF',
+                    fontSize: font_sm,
+                  }}>
+                  Dashboard
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* /// */}
+        <View>
+          <TouchableOpacity onPress={_action}>
+            <View
+              style={{
+                flexDirection: 'row',
+
+                alignItems: 'center',
+
+                borderWidth: TEST_BORDER,
+                paddingLeft: 10,
+              }}>
+              <Icon
+                name={'check-box'}
+                type="MaterialIcons"
+                style={{color: '#fff'}}></Icon>
+
+              <View style={{padding: 10}}>
+                <Text
+                  style={{
+                    color: '#FFF',
+                    fontSize: font_sm,
+                  }}>
+                  Actions
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

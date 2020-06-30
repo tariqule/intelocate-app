@@ -32,14 +32,21 @@ class CalenderComponent extends Component {
     return (
       <Animatable.View style={styles.container} animation="fadeInDown">
         <CalendarPicker
+          renderEmptyDate={() => {
+            return <View />;
+          }}
+          previousTitle=""
+          nextTitle=""
+          scrollEnabled={false}
+          disableArrowLeft={true}
+          disableArrowRight={true}
+          hideArrows={true}
+          pagingEnabled={false}
           animation="fadeInDown"
           onDateChange={this.onDateChange}
           restrictMonthNavigation
+          renderHeader={(date) => <View />}
         />
-
-        <View>
-          <Text>SELECTED DATE:{startDate}</Text>
-        </View>
       </Animatable.View>
     );
   }
