@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  Platform,
+  StyleSheet,
 } from 'react-native';
 import HeaderComponent from '../../../components/header';
 import {NavigationDashboardIcon} from '../../../svg-components/navigation-dashboard';
@@ -19,6 +21,8 @@ import {
   font_sm,
   BLACK,
   font_xs,
+  MAIN_RED,
+  TEST_BORDER,
 } from '../../../config/global-styles';
 import {Card, Divider} from 'react-native-elements';
 import {ChecklistIcon} from '../../../svg-components/checklist-icon';
@@ -32,6 +36,11 @@ import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import {offline_action_list} from '../../../redux/action/offline';
 import {ScrollView} from 'react-native-gesture-handler';
+import ActionButton from 'react-native-action-button';
+import {Icon} from 'native-base';
+import {ActionModal} from '../dashboard/index';
+import {_cleanUp} from '../../../components/nfc';
+import {Modal_PopUp} from '../../../components/popup';
 const index = () => {
   const navigation = useNavigation();
 
@@ -106,7 +115,10 @@ const index = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [count, setCount] = React.useState(2609);
   const [refreshing, setRefreshing] = React.useState(false);
-
+  const [modalVisibility, setModalVisibility] = React.useState(false);
+  const [headerTitleState, setHeaderTitleState] = React.useState('');
+  const [showPopup, setShowPopup] = React.useState(false);
+  const [refreshingFullWindow, setRefreshingFullWindow] = React.useState(false);
   const getActionsParams = {
     index: 0,
     // count: count,
@@ -155,49 +167,94 @@ const index = () => {
     } else return null;
   }
   const dispatch = useDispatch();
-
+  const _handleReportIssueButton = () => {
+    setModalVisibility(true);
+    setHeaderTitleState('Log Issue');
+  };
+  const _handleBack = () => {
+    _cleanUp();
+    setModalVisibility(false);
+  };
+  const submitIssueResponse = useSelector(
+    (state) => state.reportIssue.responseData,
+  );
   return (
     <View style={{backgroundColor: COLOR_BORDER, flex: 1}}>
       <OfflineMode />
+
       <HeaderComponent
         title={`Actions (${count})`}
         icon={<NavigationActionsIcon />}
         onLogoPress={() => navigation.dispatch(DrawerActions.openDrawer())}
       />
       {isLoading === false ? (
-        <ScrollView
-          nestedScrollEnabled={true}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={_onRefresh}></RefreshControl>
-          }>
-          <FlatList
-            data={dbActionData}
-            renderItem={({item}) => (
-              <CardItem
-                key={item.id}
-                title={item.name}
-                name={item.location !== undefined ? item.location.name : ''}
-                actionNumber={item.issueNumber}
-                created={item.createdAt}
-                status={getStatus(item.status)}
-                iconCode={
-                  item.category &&
-                  item.category.iconCode && {
-                    code: item.category.iconCode,
-                    color: MAIN_GRAY,
+        <View>
+          <ScrollView
+            nestedScrollEnabled={true}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={_onRefresh}></RefreshControl>
+            }>
+            <FlatList
+              data={dbActionData}
+              renderItem={({item}) => (
+                <CardItem
+                  key={item.id}
+                  title={item.name}
+                  name={item.location !== undefined ? item.location.name : ''}
+                  actionNumber={item.issueNumber}
+                  created={item.createdAt}
+                  status={getStatus(item.status)}
+                  iconCode={
+                    item.category &&
+                    item.category.iconCode && {
+                      code: item.category.iconCode,
+                      color: MAIN_GRAY,
+                    }
                   }
-                }
-                onPress={() => {
-                  console.log(JSON.stringify(item));
-                  dispatch(selectedAction(item));
-                  navigation.navigate(ACTION_INFO, {item});
-                }}
-              />
-            )}
-            keyExtractor={(item) => item.id}></FlatList>
-        </ScrollView>
+                  onPress={() => {
+                    console.log(JSON.stringify(item));
+                    dispatch(selectedAction(item));
+                    navigation.navigate(ACTION_INFO, {item});
+                  }}
+                />
+              )}
+              keyExtractor={(item) => item.id}></FlatList>
+          </ScrollView>
+          <ActionButton
+            buttonColor={ACTIVE_BLUE}
+            style={{bottom: Platform.OS === 'android' ? 50 : 100}}>
+            <ActionButton.Item
+              buttonColor={MAIN_RED}
+              title="Report Issue"
+              onPress={_handleReportIssueButton}>
+              <Icon name="md-create" style={styles.actionButtonIcon} />
+            </ActionButton.Item>
+          </ActionButton>
+
+          <ActionModal
+            modalVisible={modalVisibility}
+            onPressBackButton={_handleBack}
+            headerTitle={headerTitleState}
+            didSubmit={(submitted) => {
+              setShowPopup(submitted);
+              // console.log(issueNumber);
+              // setIssueNumber(issueNumber);
+            }}
+            // nfcLocationId={etagLocationId}
+            loading={(refreshing) => setIsLoading(refreshing)}
+          />
+          {showPopup && (
+            <Modal_PopUp
+              isVisible={showPopup}
+              title="Issue Submitted"
+              issueNumber={`Issue #${submitIssueResponse.map(
+                (e) => e.issueNumber,
+              )}`}
+              onPress={() => setShowPopup(false)}></Modal_PopUp>
+          )}
+        </View>
       ) : (
         <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
           <ActivityIndicator size={'large'} />
@@ -208,3 +265,46 @@ const index = () => {
 };
 
 export default index;
+
+const styles = StyleSheet.create({
+  dropDown: {
+    borderWidth: 1,
+    borderColor: ACTIVE_BLUE,
+    borderRadius: 2,
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: 'white',
+  },
+  issueTitle: {
+    fontSize: 20,
+    left: 2,
+    padding: 10,
+  },
+  issueCategorizeTitle: {
+    fontSize: 15,
+    // left: 10,
+    padding: 10,
+    color: MAIN_GRAY,
+  },
+  col: {
+    // justifyContent: 'center',
+    alignContent: 'center',
+    borderWidth: TEST_BORDER,
+    alignItems: 'center',
+    height: 80,
+  },
+  iconCategory: {
+    color: MAIN_GRAY,
+    fontSize: 20,
+  },
+  colText: {
+    color: MAIN_GRAY,
+    // padding: ,
+    fontSize: 10,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+  },
+});

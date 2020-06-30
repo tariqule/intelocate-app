@@ -268,7 +268,7 @@ interface actionModalProps {
   nfcLocationId?: string;
   loading?: (boolean) => void;
 }
-const ActionModal = (props: actionModalProps) => {
+export const ActionModal = (props: actionModalProps) => {
   const offlineCategories = useSelector(
     (state) => state.reportIssue.offlineCategories,
   );
