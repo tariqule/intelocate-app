@@ -7,11 +7,14 @@ import {
   MAIN_GRAY,
   ACTIVE_BLUE,
 } from '../../../../config/global-styles';
+import * as Animatable from 'react-native-animatable';
 
 const Status = () => {
   return (
     <View style={{justifyContent: 'center'}}>
-      <GridComponentLayout />
+      <Animatable.View animation="fadeInDown">
+        <GridComponentLayout />
+      </Animatable.View>
     </View>
   );
 };

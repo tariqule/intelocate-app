@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
-
+import * as Animatable from 'react-native-animatable';
 const Calender = () => {
   return (
     <View>
@@ -30,8 +30,9 @@ class CalenderComponent extends Component {
     const {selectedStartDate} = this.state;
     const startDate = selectedStartDate ? selectedStartDate.toString() : '';
     return (
-      <View style={styles.container}>
+      <Animatable.View style={styles.container} animation="fadeInDown">
         <CalendarPicker
+          animation="fadeInDown"
           onDateChange={this.onDateChange}
           restrictMonthNavigation
         />
@@ -39,7 +40,7 @@ class CalenderComponent extends Component {
         <View>
           <Text>SELECTED DATE:{startDate}</Text>
         </View>
-      </View>
+      </Animatable.View>
     );
   }
 }

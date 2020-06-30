@@ -205,7 +205,6 @@ const dashboard = () => {
               refreshing={refreshingCom}
               onRefresh={_onRefresh}></RefreshControl>
           }
-          padder
           style={{backgroundColor: COLOR_BORDER}}>
           <Accordion
             dataArray={dataArray}
@@ -625,7 +624,7 @@ export const ActionModal = (props: actionModalProps) => {
 
               <DropDownX
                 data={userLocations}
-                defaultValue={userLocations[0]}
+                defaultValue={userLocations}
                 id={true}
                 // disabled={true}
                 containerStyle={{

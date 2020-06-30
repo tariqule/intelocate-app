@@ -60,7 +60,7 @@ const ProjectDetails = (props) => {
             <DropDown
               id={true}
               data={categories}
-              value={selected.category.name}
+              value={selected.category && selected.category.name}
               style={{width: '100%'}}
               containerStyle={styles.dropDown}
               onChange={(val) => _onChangeCategory(val)}

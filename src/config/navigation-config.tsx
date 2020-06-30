@@ -22,6 +22,16 @@ export const DASHBOARD = 'DASHBOARD';
 export const ACTION = 'ACTION';
 export const ACTION_INFO = 'ACTION_INFO';
 
+function DrawerNavigator() {
+  return (
+    <Drawer.Navigator
+      initialRouteName={DASHBOARD}
+      drawerContent={() => <DrawerContent />}>
+      <Stack.Screen name={DASHBOARD} component={DashboardScreen} />
+      <Stack.Screen name={ACTION} component={ActionScreen} />
+    </Drawer.Navigator>
+  );
+}
 function Navigator() {
   return (
     <NavigationContainer>
@@ -40,17 +50,6 @@ function Navigator() {
         {/* </Drawer.Navigator> */}
       </Stack.Navigator>
     </NavigationContainer>
-  );
-}
-
-function DrawerNavigator() {
-  return (
-    <Drawer.Navigator
-      initialRouteName={DASHBOARD}
-      drawerContent={() => <DrawerContent />}>
-      <Stack.Screen name={DASHBOARD} component={DashboardScreen} />
-      <Stack.Screen name={ACTION} component={ActionScreen} />
-    </Drawer.Navigator>
   );
 }
 

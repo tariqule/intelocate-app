@@ -26,6 +26,8 @@ import {ACTION_INFO} from '../../../../config/navigation-config';
 import {useDispatch} from 'react-redux';
 import {offline_action_list} from '../../../../redux/action/offline';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
+import {selectedAction} from '../../../../redux/action/issue-action';
+import * as Animatable from 'react-native-animatable';
 function Item(data) {
   const changeSubstring = 30;
   const [val, setVal] = React.useState();
@@ -118,6 +120,7 @@ const Action = () => {
 
   const getActionsParams = {
     index: 0,
+    count: 60,
     sort: 'recently_updated_desc',
   };
 
@@ -150,39 +153,43 @@ const Action = () => {
     }, 1000);
   };
   return (
-    <ScrollView nestedScrollEnabled={true} style={{height: 350}}>
-      {!refreshing ? (
-        <FlatList
-          data={dbActionData}
-          renderItem={({item}) => (
-            <Item
-              key={item.id}
-              title={item.name}
-              status={item.status}
-              onPressAction={() => navigation.navigate(ACTION_INFO, {item})}
-              // onPressDropDown={() => _onPressDropdown(item)}
-              onChangeDropDownValue={(val) => {
-                console.log(val + ' => Changed val');
-                updateAction(item.id, {status: val}, (res) => {
-                  getAction(getActionsParams, (response) => {
-                    console.log(JSON.stringify(response));
-                    setDbActionData(response.data);
+    <Animatable.View animation="fadeInDown">
+      <ScrollView nestedScrollEnabled={true} style={{height: 350}}>
+        {!refreshing ? (
+          <FlatList
+            data={dbActionData}
+            renderItem={({item}) => (
+              <Item
+                key={item.id}
+                title={item.name}
+                status={item.status}
+                onPressAction={() => navigation.navigate(ACTION_INFO, {item})}
+                // onPressDropDown={() => _onPressDropdown(item)}
+                onChangeDropDownValue={(val) => {
+                  console.log(val + ' => Changed val');
+                  updateAction(item.id, {status: val}, (res) => {
+                    getAction(getActionsParams, (response) => {
+                      console.log(JSON.stringify(response));
+
+                      dispatch(selectedAction(item));
+                      setDbActionData(response.data);
+                    });
                   });
-                });
-                setDropDownValue(val);
-              }}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={headerComponent}
-          ListHeaderComponentStyle={{height: 40}}
-          nestedScrollEnabled={true}
-          refreshing={true}
-        />
-      ) : (
-        <ActivityIndicator />
-      )}
-    </ScrollView>
+                  setDropDownValue(val);
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            ListHeaderComponent={headerComponent}
+            ListHeaderComponentStyle={{height: 40}}
+            nestedScrollEnabled={true}
+            refreshing={true}
+          />
+        ) : (
+          <ActivityIndicator />
+        )}
+      </ScrollView>
+    </Animatable.View>
   );
 };
 export default Action;

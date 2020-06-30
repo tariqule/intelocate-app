@@ -34,7 +34,7 @@ export default () => {
 
   React.useEffect(() => {
     getToken().then((res) => {
-      res && navigation.navigate(DASHBOARD);
+      res && navigation.reset({index: 1, routes: [{name: DASHBOARD}]});
     });
   }, []);
   const _onPressSubmit = () => {
@@ -43,7 +43,9 @@ export default () => {
       password,
       (response) => {
         console.log(response);
-        storeToken(response.data).then(() => navigation.navigate(DASHBOARD));
+        storeToken(response.data).then(() =>
+          navigation.reset({index: 1, routes: [{name: DASHBOARD}]}),
+        );
       },
       (error) =>
         Alert.alert(

@@ -15,11 +15,13 @@ const LocationInfo = (props) => {
   // const countryCode = data.country_code;
   // const cityName = data.country;
   // const address1 = data.address_1;
-  const identifier = selectedAction.location.identifier;
-  const name = selectedAction.location.name;
-  const countryCode = selectedAction.location.country_code;
-  const cityName = selectedAction.location.city;
-  const address1 = selectedAction.location.address_1;
+  const identifier =
+    selectedAction.location && selectedAction.location.identifier;
+  const name = selectedAction.location && selectedAction.location.name;
+  const countryCode =
+    selectedAction.location && selectedAction.location.country_code;
+  const cityName = selectedAction.location && selectedAction.location.city;
+  const address1 = selectedAction.location && selectedAction.location.address_1;
   return (
     <View>
       <View style={FormStyles.formRow}>
