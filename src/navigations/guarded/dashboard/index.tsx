@@ -291,7 +291,7 @@ export const ActionModal = (props: actionModalProps) => {
   const isConnected = useSelector((state) => state.network.isConnected);
 
   const [organization, setOrganization] = React.useState(
-    offlineOrganizationList ? offlineOrganizationList : [],
+    offlineOrganizationList,
   );
   const [categories, setCategories] = React.useState(
     offlineCategories ? offlineCategories : [],
@@ -301,7 +301,7 @@ export const ActionModal = (props: actionModalProps) => {
   );
   const [categoriesIssue, setCategoriesIssue] = React.useState([]);
   const [userLocations, setUserLocations] = React.useState(
-    offlineOrganizationLocationList ? offlineOrganizationLocationList : [],
+    offlineOrganizationLocationList,
   );
   const [selectedIconColor, setIconSelectedColor] = React.useState(MAIN_GRAY);
   const [selectedCategory, setSelectedCategory] = React.useState([]);
@@ -347,6 +347,10 @@ export const ActionModal = (props: actionModalProps) => {
       // setNfcId(res);
     });
 
+    console.log(
+      JSON.stringify(offlineOrganizationList) + 'offline organaization',
+    );
+
     // !isConnected &&
     //   setOrganization(
     //     offlineOrganizationsPacketData.map((e) => {
@@ -372,20 +376,32 @@ export const ActionModal = (props: actionModalProps) => {
     //         });
     //       })
     //       .flatMap((e) => e)
-    if (!isConnected) {
-      setOrganization(
-        offlineOrganizationsPacketData.map((e) => {
-          let mapOrg = e._organizations
-            .map((v) => {
-              return {id: v.id, name: v.name, locations: v._locations};
-            })
-            .flatMap((e) => e);
+    // if (!isConnected) {
+    //   setOrganization(
+    //     offlineOrganizationsPacketData.map((e) => {
+    //       let mapOrg = e._organizations
+    //         .map((v) => {
+    //           return {id: v.id, name: v.name, locations: v._locations};
+    //         })
+    //         .flatMap((e) => e);
 
-          let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
-          return [...mapOrg, ...mapTenant];
-        })[0],
-      );
-    }
+    //       let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
+    //       return [...mapOrg, ...mapTenant];
+    //     })[0],
+    //   );
+    // }
+    setOrganization(
+      offlineOrganizationsPacketData.map((e) => {
+        let mapOrg = e._organizations
+          .map((v) => {
+            return {id: v.id, name: v.name, locations: v._locations};
+          })
+          .flatMap((e) => e);
+
+        let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
+        return [...mapOrg, ...mapTenant];
+      })[0],
+    );
     console.log(
       JSON.stringify(
         offlineOrganizationsPacketData.map((e) => {
@@ -414,20 +430,20 @@ export const ActionModal = (props: actionModalProps) => {
     retrieveUserInfo().then((res) => {
       setUserOrganization(res.organization.id);
 
-      getListOrganizationWithLocation(
-        res.organization.id,
-        'CREATE_PROJECT',
-        (resOrg) => {
-          getListTenantsWithLocation((resTenants) => {
-            dispatch(
-              offline_organization_list([...resOrg.data, ...resTenants.data]),
-            );
-            setOrganization([...resOrg.data, ...resTenants.data]);
-          });
+      // getListOrganizationWithLocation(
+      //   res.organization.id,
+      //   'CREATE_PROJECT',
+      //   (resOrg) => {
+      //     getListTenantsWithLocation((resTenants) => {
+      //       dispatch(
+      //         offline_organization_list([...resOrg.data, ...resTenants.data]),
+      //       );
+      //       setOrganization([...resOrg.data, ...resTenants.data]);
+      //     });
 
-          // setOrganization([...organization, ...res.data]);
-        },
-      );
+      //     // setOrganization([...organization, ...res.data]);
+      //   },
+      // );
     });
 
     // getListOrganization()
@@ -497,6 +513,7 @@ export const ActionModal = (props: actionModalProps) => {
     console.warn(JSON.stringify(data) + ' ====> pressed data');
     if (isConnected) {
       getListLocationByOrganization(val, (res) => {
+        console.log(JSON.stringify(res.data) + 'on press organization');
         // offlineOrganizationList(res.data);
         dispatch(offline_organizaton_location_list(res.data));
         setUserLocations(res.data);
@@ -627,6 +644,7 @@ export const ActionModal = (props: actionModalProps) => {
                 data={userLocations}
                 defaultValue={userLocations}
                 id={true}
+                organization={true}
                 // disabled={true}
                 containerStyle={{
                   borderWidth: 1,
