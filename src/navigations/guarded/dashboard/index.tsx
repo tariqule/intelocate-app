@@ -390,6 +390,7 @@ export const ActionModal = (props: actionModalProps) => {
     //     })[0],
     //   );
     // }
+    
     setOrganization(
       offlineOrganizationsPacketData.map((e) => {
         let mapOrg = e._organizations

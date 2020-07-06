@@ -35,8 +35,11 @@ export function DrawerContent() {
   }, []);
 
   const _signOut = () => {
-    // storeToken('').then(())
-    navigation.navigate(SIGN_IN_SCREEN);
+    let params = {jwt: ''};
+    storeToken(params).then(() =>
+      navigation.reset({index: 1, routes: [{name: SIGN_IN_SCREEN}]}),
+    );
+    // navigation.navigate(SIGN_IN_SCREEN);
   };
   const _dashboard = () => {
     navigation.goBack();
