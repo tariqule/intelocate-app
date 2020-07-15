@@ -34,7 +34,10 @@ import OfflineMode from '../../../components/offline';
 import {selectedAction} from '../../../redux/action/issue-action';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
-import {offline_action_list} from '../../../redux/action/offline';
+import {
+  offline_action_list,
+  report_issue_fn,
+} from '../../../redux/action/offline';
 import {ScrollView} from 'react-native-gesture-handler';
 import ActionButton from 'react-native-action-button';
 import {Icon} from 'native-base';
@@ -43,6 +46,7 @@ import {_cleanUp} from '../../../components/nfc';
 import {Modal_PopUp} from '../../../components/popup';
 import {getStats} from '../../../services/getStats';
 import {actionStats, totalActionCount} from '../../../redux/action/stats';
+import {retrieveUserInfo} from '../../../services/local-storage';
 const index = () => {
   const navigation = useNavigation();
 
@@ -137,6 +141,9 @@ const index = () => {
   const offlineActionList = useSelector(
     (state) => state.reportIssue.offlineAllActionList,
   );
+  const offlineQueuedData = useSelector(
+    (state) => state.reportIssue.offlineData,
+  );
 
   const actionStatsCount = useSelector((state) => state.actionStats.totalCnt);
 
@@ -205,6 +212,11 @@ const index = () => {
     getAction(getActionsParams, (response) => {
       console.log(JSON.stringify(response));
       setDbActionData(response.data);
+      console.log('releasing offline... ');
+      retrieveUserInfo().then((res) => {
+        dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
+        console.log('offline data released. ');
+      });
       setRefreshing(false);
     });
   };

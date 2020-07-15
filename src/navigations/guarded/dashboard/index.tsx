@@ -185,8 +185,7 @@ const dashboard = () => {
     // alert(isConnected);
     if (isConnected) {
       // setEtagLocationId('Tag');
-
-      // refreshComponent ? setRefreshComponent(false) : setRefreshComponent(true);
+      /**RELEASE OFFLINE DATA */
       retrieveUserInfo().then((res) => {
         dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
         setRefreshingCom(false);
