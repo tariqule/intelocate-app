@@ -12,7 +12,12 @@ import * as Animatable from 'react-native-animatable';
 import Collapsible from 'react-native-collapsible';
 import Accordion from 'react-native-collapsible/Accordion';
 import {Icon} from 'native-base';
-import {MAIN_GRAY, font_md, font_sm_md} from '../../config/global-styles';
+import {
+  MAIN_GRAY,
+  font_md,
+  font_sm_md,
+  TEST_BORDER,
+} from '../../config/global-styles';
 
 export default class AccordionX extends Component {
   state = {
@@ -37,7 +42,10 @@ export default class AccordionX extends Component {
         duration={400}
         style={[styles.header, isActive ? styles.active : styles.inactive]}
         transition="backgroundColor">
-        <Text style={styles.headerText}>{section.title}</Text>
+        <View style={{width: '100%', borderWidth: TEST_BORDER}}>
+          <Text style={styles.headerText}>{section.title}</Text>
+        </View>
+
         {isActive ? (
           <Icon style={{fontSize: 18}} name="ios-arrow-up" type="Ionicons" />
         ) : (
