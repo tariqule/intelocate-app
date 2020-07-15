@@ -45,7 +45,7 @@ export default class AccordionX extends Component {
         <View style={{width: '100%', borderWidth: TEST_BORDER}}>
           <Text style={styles.headerText}>{section.title}</Text>
         </View>
-
+        {/* //n */}
         {isActive ? (
           <Icon style={{fontSize: 18}} name="ios-arrow-up" type="Ionicons" />
         ) : (
