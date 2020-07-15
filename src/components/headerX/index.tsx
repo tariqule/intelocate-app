@@ -11,7 +11,7 @@ import {
   Right,
 } from 'native-base';
 import {MAIN_BLUE, font_sm} from '../../config/global-styles';
-import {HeaderProps} from 'react-native-elements';
+// import {HeaderProps} from 'react-native-elements';
 
 interface HeaderProps {
   iconName?: string;
@@ -32,6 +32,7 @@ interface HeaderProps {
   iconStyle?: any;
   title: string;
   titleStyle?: string;
+  rightComponent?: any;
   onPress?: () => void;
 }
 const HeaderX = (props: HeaderProps) => {
@@ -51,7 +52,7 @@ const HeaderX = (props: HeaderProps) => {
       <Body>
         <Title>{props.title}</Title>
       </Body>
-      <Right>{/* <Button transparent><Icon name="menu" /></Button> */}</Right>
+      <Right>{props.rightComponent}</Right>
     </Header>
   );
 };

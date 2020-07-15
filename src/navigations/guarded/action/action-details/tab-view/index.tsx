@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
 
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import TabBar from '../../../../../components/tab-bar/index';
+import ScrollableTabBar from '../../../../../components/tab-bar/index';
 import AccordianX from '../../../../../components/accordianX';
 import ActionStatus from '../action-status';
 import ProjectInfo from '../project-info';
@@ -37,13 +37,13 @@ export const TabView = (props) => {
     <ScrollableTabView
       initialPage={0}
       locked={false}
-      renderTabBar={() => <TabBar />}>
+      renderTabBar={() => <ScrollableTabBar />}>
       <ScrollView tabLabel="md-home" style={styles.tabView}>
         <View style={styles.card}>
           <AccordianX data={actionMainData} />
         </View>
       </ScrollView>
-      <ScrollView tabLabel="md-checkbox" style={styles.tabView}>
+      <ScrollView tabLabel="checklist" style={styles.tabView}>
         <View style={styles.card}>
           <Text>Friends</Text>
         </View>
@@ -58,14 +58,14 @@ export const TabView = (props) => {
           <Text>No Files Found.</Text>
         </View>
       </ScrollView>
-      <ScrollView
+      {/* <ScrollView
         tabLabel="nfc"
         type={'MaterialCommunityIcons'}
         style={styles.tabView}>
         <View style={styles.card}>
           <Text>NFC feature is not avaiable.</Text>
         </View>
-      </ScrollView>
+      </ScrollView> */}
     </ScrollableTabView>
   );
 };

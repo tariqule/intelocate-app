@@ -19,7 +19,11 @@ import {
   TEST_BORDER,
 } from '../../../../config/global-styles';
 import DropDown from '../../../../components/dropdown';
-import {getAction, updateAction} from '../../../../services/getAction';
+import {
+  getAction,
+  updateAction,
+  getDashboardAction,
+} from '../../../../services/getAction';
 import {getCurrentUser} from '../../../../services/getUser';
 import {useNavigation} from '@react-navigation/native';
 import {ACTION_INFO} from '../../../../config/navigation-config';
@@ -28,6 +32,7 @@ import {offline_action_list} from '../../../../redux/action/offline';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import {selectedAction} from '../../../../redux/action/issue-action';
 import * as Animatable from 'react-native-animatable';
+
 function Item(data) {
   const showStatus = [
     {label: 'New', value: 'NEW'},
@@ -40,7 +45,18 @@ function Item(data) {
   return (
     <View style={{flex: 1, borderWidth: TEST_BORDER}}>
       <View style={{flexDirection: 'row', height: 60}}>
-        <View style={{height: 50, width: 3, backgroundColor: MAIN_RED}}></View>
+        {data.hasUnreadEvents ? (
+          <View
+            style={{height: 50, width: 3, backgroundColor: MAIN_RED}}></View>
+        ) : (
+          <View
+            style={{
+              height: 50,
+              width: 3,
+              backgroundColor: 'transparent',
+            }}></View>
+        )}
+
         <View style={{flex: 6, justifyContent: 'center', paddingLeft: 5}}>
           <TouchableOpacity onPress={data.onPressAction}>
             <Text style={{color: ACTIVE_BLUE}}>
@@ -124,7 +140,7 @@ const Action = () => {
   const [dbActionData, setDbActionData] = React.useState(offlineActionList);
   const [dropDownValue, setDropDownValue] = React.useState('');
   const [refreshing, setRefreshing] = React.useState(false);
-
+  const [abortConnection, setAbortConnection] = React.useState(false);
   const getActionsParams = {
     index: 0,
     count: 60,
@@ -133,9 +149,9 @@ const Action = () => {
 
   const dispatch = useDispatch();
   React.useEffect(() => {
-    if (isConnected) {
+    if (isConnected && !abortConnection) {
       setRefreshing(true);
-      getAction(getActionsParams, (response) => {
+      getDashboardAction(getActionsParams, (response) => {
         console.log(JSON.stringify(response));
         dispatch(offline_action_list(response.data));
         setDbActionData(response.data);
@@ -145,6 +161,9 @@ const Action = () => {
     } else {
       Alert.alert('Offline Mode', 'You are currently viewing offline.');
     }
+    return function cleanup() {
+      setAbortConnection(true);
+    };
   }, []);
 
   const _onPressDropdown = (item) => {
@@ -170,6 +189,7 @@ const Action = () => {
                 key={item.id}
                 title={item.name}
                 status={item.status}
+                hasUnreadEvents={item.hasUnreadEvents}
                 onPressAction={() => navigation.navigate(ACTION_INFO, {item})}
                 // onPressDropDown={() => _onPressDropdown(item)}
                 onChangeDropDownValue={(val) => {

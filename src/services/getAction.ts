@@ -12,6 +12,17 @@ export const getAction = (params, reposnse) => {
       console.log(JSON.stringify(err) + 'Error: [get Action Service]'),
     );
 };
+export const getDashboardAction = (params, reposnse) => {
+  console.log(
+    JSON.stringify(params) + 'dta to be sent to db [get Action Service',
+  );
+  api
+    .post('/dashboard/tasks', params)
+    .then((response) => reposnse(response))
+    .catch((err) =>
+      console.log(JSON.stringify(err) + 'Error: [get Action Service]'),
+    );
+};
 
 export const getSpecificTask = (taskId: string, response: any) => {
   api

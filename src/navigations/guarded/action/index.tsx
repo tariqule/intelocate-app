@@ -41,12 +41,18 @@ import {Icon} from 'native-base';
 import {ActionModal} from '../dashboard/index';
 import {_cleanUp} from '../../../components/nfc';
 import {Modal_PopUp} from '../../../components/popup';
+import {getStats} from '../../../services/getStats';
+import {actionStats, totalActionCount} from '../../../redux/action/stats';
 const index = () => {
   const navigation = useNavigation();
 
   const CardItem = (item) => (
     <TouchableOpacity onPress={item.onPress}>
-      <Card style={{flex: 1}}>
+      <Card
+        containerStyle={{
+          flex: 1,
+          justifyContent: 'center',
+        }}>
         <View
           style={{
             flexDirection: 'row',
@@ -58,44 +64,65 @@ const index = () => {
               style={{
                 height: 60,
                 width: 60,
+                padding: 4,
                 borderRadius: 100,
                 backgroundColor: COLOR_BORDER,
                 justifyContent: 'center',
                 alignItems: 'center',
                 // padding: 12,
               }}>
-              {item.iconCode ? IconByCode(item.iconCode) : <ChecklistIcon />}
+              {item.iconCode ? (
+                IconByCode(item.iconCode)
+              ) : (
+                <View style={{height: 30, width: 30}}>
+                  <ChecklistIcon />
+                </View>
+              )}
             </View>
           </View>
           <View style={{flexDirection: 'column', flex: 3}}>
-            <Text
-              style={{
-                color: ACTIVE_BLUE,
-                fontSize: font_sm,
-                fontWeight: 'bold',
-              }}>
-              {item.title}
-            </Text>
-            <Text style={{color: BLACK, fontSize: font_xs}}>{item.name}</Text>
-
-            <Text style={{color: BLACK, fontSize: font_xs}}>
-              {item.actionNumber}
-            </Text>
-            <Text style={{color: BLACK, fontSize: font_xs}}>
-              {item.created}
-            </Text>
+            <View>
+              <Text
+                style={{
+                  color: ACTIVE_BLUE,
+                  fontSize: font_sm,
+                  fontWeight: 'bold',
+                }}>
+                {item.title}
+              </Text>
+            </View>
+            <View>
+              <Text style={{color: BLACK, fontSize: font_xs}}>{item.name}</Text>
+            </View>
+            <View>
+              <Text style={{color: BLACK, fontSize: font_xs}}>
+                {item.actionNumber}
+              </Text>
+            </View>
+            <View>
+              <Text style={{color: BLACK, fontSize: font_xs}}>
+                {item.created}
+              </Text>
+            </View>
           </View>
         </View>
         <View style={{padding: 10}}>
           <Divider style={{borderWidth: 1, borderColor: COLOR_BORDER}} />
         </View>
         <View>
-          <TouchableOpacity style={{width: '100%'}}>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <TouchableOpacity>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+              }}>
               <Text
                 style={{
                   color: MAIN_GRAY,
                   fontWeight: 'bold',
+                  width: '100%',
+                  textAlign: 'center',
                 }}>
                 STATUS: {item.status}
               </Text>
@@ -111,22 +138,45 @@ const index = () => {
     (state) => state.reportIssue.offlineAllActionList,
   );
 
+  const actionStatsCount = useSelector((state) => state.actionStats.totalCnt);
+
   const [dbActionData, setDbActionData] = React.useState(offlineActionList);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [count, setCount] = React.useState(2609);
+  const [count, setCount] = React.useState(actionStatsCount || 0);
   const [refreshing, setRefreshing] = React.useState(false);
   const [modalVisibility, setModalVisibility] = React.useState(false);
   const [headerTitleState, setHeaderTitleState] = React.useState('');
   const [showPopup, setShowPopup] = React.useState(false);
   const [refreshingFullWindow, setRefreshingFullWindow] = React.useState(false);
+  const [abortConnection, setAbortConnection] = React.useState(false);
+
   const getActionsParams = {
     index: 0,
     // count: count,
     sort: 'recently_updated_desc',
   };
 
+  const getCurrentStats = () => {
+    getStats((res) => {
+      console.log(
+        JSON.stringify(res) +
+          '===> Action Stats Retrieved. [Dashboard] [USE_EFFECT]',
+      );
+      let sum = res.data
+        .map((o) => o.cnt)
+        .reduce((a, c) => {
+          return a + c;
+        });
+      setCount(sum);
+      console.log(sum + 'RESULT COUNT');
+      dispatch(actionStats(res.data));
+      dispatch(totalActionCount(sum));
+    });
+  };
+
   React.useEffect(() => {
-    if (isConnected) {
+    if (isConnected && !abortConnection) {
+      getCurrentStats();
       setIsLoading(true);
       getAction(getActionsParams, (response) => {
         console.log(JSON.stringify(response));
@@ -137,6 +187,11 @@ const index = () => {
     } else {
       console.warn('You are currently viewing offline.');
     }
+    return function cleanup() {
+      return function cleanup() {
+        setAbortConnection(true);
+      };
+    };
   }, []);
 
   const showStatus = [
@@ -144,15 +199,18 @@ const index = () => {
     {label: 'CANCELLED', value: 'CANCELLED'},
     {label: 'IN PROGRESS', value: 'INPROGRESS'},
   ];
-
+  const getCurrentActionList = () => {
+    getCurrentStats();
+    setRefreshing(true);
+    getAction(getActionsParams, (response) => {
+      console.log(JSON.stringify(response));
+      setDbActionData(response.data);
+      setRefreshing(false);
+    });
+  };
   const _onRefresh = () => {
     if (isConnected) {
-      setRefreshing(true);
-      getAction(getActionsParams, (response) => {
-        console.log(JSON.stringify(response));
-        setDbActionData(response.data);
-        setRefreshing(false);
-      });
+      getCurrentActionList();
     } else {
       Alert.alert('Offline Mode', 'You are currently viewing offline.');
     }
@@ -224,7 +282,9 @@ const index = () => {
           </ScrollView>
           <ActionButton
             buttonColor={ACTIVE_BLUE}
-            style={{bottom: Platform.OS === 'android' ? 50 : 100}}>
+            style={{
+              bottom: Platform.OS === 'android' ? 100 : 100,
+            }}>
             <ActionButton.Item
               buttonColor={MAIN_RED}
               title="Report Issue"
@@ -239,6 +299,7 @@ const index = () => {
             headerTitle={headerTitleState}
             didSubmit={(submitted) => {
               setShowPopup(submitted);
+              getCurrentActionList();
               // console.log(issueNumber);
               // setIssueNumber(issueNumber);
             }}

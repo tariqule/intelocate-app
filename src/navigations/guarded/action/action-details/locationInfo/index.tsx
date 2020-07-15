@@ -27,7 +27,7 @@ const LocationInfo = (props) => {
       <View style={FormStyles.formRow}>
         <View style={FormStyles.formCellHalf}>
           <Text style={{...FormTextStyles.formLabel, fontWeight: 'bold'}}>
-            Number:
+            Store code:
           </Text>
           <Text style={FormStyles.formFieldView}>{identifier}</Text>
         </View>

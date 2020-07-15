@@ -1,4 +1,4 @@
-import {StyleSheet, ViewStyle, TextStyle} from 'react-native';
+import {StyleSheet, ViewStyle, TextStyle, Dimensions} from 'react-native';
 
 export const COLOR_BORDER = '#e0e0e0';
 export const MAIN_GRAY = '#8e8e8e';
@@ -14,6 +14,9 @@ export const font_sm_md = 22;
 export const font_md = 25;
 
 export const TEST_BORDER = 0;
+
+export const deviceheight = Dimensions.get('window').height;
+export const deviceWidth = Dimensions.get('window').width;
 
 export default StyleSheet.create({
   defaultBackground: {

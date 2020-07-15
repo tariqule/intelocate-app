@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, Dimensions} from 'react-native';
 import HeaderX from '../../../../components/headerX';
 import {useNavigation} from '@react-navigation/native';
 import ActionHeader from '../../../../components/action-header';
@@ -12,6 +12,7 @@ import {Divider} from 'react-native-elements';
 import {getSpecificTask} from '../../../../services/getAction';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 import {selectedAction} from '../../../../redux/action/issue-action';
+import {deviceheight, deviceWidth} from '../../../../config/global-styles';
 
 const ActionInfo = ({route}) => {
   const {item} = route.params;
@@ -23,6 +24,7 @@ const ActionInfo = ({route}) => {
     navigation.goBack();
   };
   React.useEffect(() => {
+    console.log(`height: ${deviceheight} width: ${deviceWidth} `);
     getSpecificTask(item.id, (res) => {
       console.log(JSON.stringify(res) + 'SBajs');
       dispatch(selectedAction(res.data));
@@ -33,11 +35,11 @@ const ActionInfo = ({route}) => {
     <View style={{flex: 1}}>
       <HeaderX title="Action Detail" onPress={_onPressBackButton} />
 
-      <View style={{flex: 2}}>
+      <View style={{flex: deviceheight >= 992 ? 1 : 1.6}}>
         <ActionHeader title={item.name} actionNumber={item.issueNumber} />
       </View>
       <Divider />
-      <View style={{flex: 8}}>
+      <View style={{flex: 6}}>
         <TabView
           id={item.id}
           location={'specificTask.location'}

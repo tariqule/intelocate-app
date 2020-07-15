@@ -2,37 +2,47 @@ import {DrawerActions, useNavigation} from '@react-navigation/native';
 import {Accordion, Button, Container, Content, Footer, Icon} from 'native-base';
 import React from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Modal,
   Platform,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Alert,
-  ActivityIndicator,
-  RefreshControl,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
-import DropDownPicker from 'react-native-dropdown-picker';
-import {Divider, Header, Input} from 'react-native-elements';
+import * as Animatable from 'react-native-animatable';
+import {Divider, Input} from 'react-native-elements';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import CategoryCard from '../../../components/categories-card';
 import DropDownX from '../../../components/dropdown';
 import HeaderComponent from '../../../components/header';
+import HeaderX from '../../../components/headerX';
+import {_cleanUp, _NfcOn} from '../../../components/nfc';
+import OfflineMode from '../../../components/offline';
+import {Modal_PopUp} from '../../../components/popup';
 import {
   ACTIVE_BLUE,
   COLOR_BORDER,
-  MAIN_BLUE,
   MAIN_GRAY,
   MAIN_RED,
   TEST_BORDER,
-  font_md,
-  font_sm_md,
 } from '../../../config/global-styles';
+import {
+  offline_category_list,
+  offline_external_user_list,
+  offline_organizations,
+  offline_organizaton_location_list,
+  report_issue_fn,
+} from '../../../redux/action/offline';
 import {getCategories} from '../../../services/getCategories';
 import {getExternalUsers} from '../../../services/getUser';
-import {sendIssue} from '../../../services/issue';
 import {retrieveUserInfo} from '../../../services/local-storage';
+import {getUserByNfc} from '../../../services/nfc';
+import {getOfflineOrganizations} from '../../../services/offline';
 import {
   getListLocationByOrganization,
   getListOrganizationWithLocation,
@@ -44,26 +54,8 @@ import Announcement from './announcement';
 import Calender from './calendar';
 import Location from './location';
 import Status from './status';
-import PopUp from 'react-native-modal';
-import {Modal_PopUp} from '../../../components/popup';
-import {_NfcOn, _cleanUp} from '../../../components/nfc';
-import * as Animatable from 'react-native-animatable';
-import {getUserByNfc} from '../../../services/nfc';
-import {NetworkConsumer, checkInternetConnection} from 'react-native-offline';
-import {OfflineModeIcon} from '../../../svg-components/offline-mode-icon';
-import OfflineMode from '../../../components/offline';
-import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
-import {
-  report_issue_fn,
-  clear_queue,
-  offline_category_list,
-  offline_organization_list,
-  offline_organizaton_location_list,
-  offline_external_user_list,
-  offline_organizations,
-} from '../../../redux/action/offline';
-import {useSelector} from 'react-redux/lib/hooks/useSelector';
-import {getOfflineOrganizations} from '../../../services/offline';
+import {getStats} from '../../../services/getStats';
+import {actionStats, totalActionCount} from '../../../redux/action/stats';
 
 const dataArray = [
   {
@@ -147,6 +139,21 @@ const dashboard = () => {
   const newLocal_1 = '[DASHBOARD] [REPORT_ISSUE_RESPONSE]';
 
   React.useEffect(() => {
+    getStats((res) => {
+      console.log(
+        JSON.stringify(res) +
+          '===> Action Stats Retrieved. [Dashboard] [USE_EFFECT]',
+      );
+      let sum = res.data
+        .map((o) => o.cnt)
+        .reduce((a, c) => {
+          return a + c;
+        });
+
+      console.log(sum + 'RESULT COUNT');
+      dispatch(actionStats(res.data));
+      dispatch(totalActionCount(sum));
+    });
     console.log(JSON.stringify(submitIssueResponse) + newLocal_1);
 
     if (isConnected && offlineQueuedData) {
@@ -390,7 +397,7 @@ export const ActionModal = (props: actionModalProps) => {
     //     })[0],
     //   );
     // }
-    
+
     setOrganization(
       offlineOrganizationsPacketData.map((e) => {
         let mapOrg = e._organizations
@@ -588,7 +595,26 @@ export const ActionModal = (props: actionModalProps) => {
       onRequestClose={props.onPressBackButton}>
       <Container style={{flex: 1}}>
         <OfflineMode />
-        <Header
+        <HeaderX
+          title="Log Issue"
+          onPress={props.onPressBackButton}
+          rightComponent={
+            Platform.OS !== 'ios' && (
+              <Animatable.View
+                animation="rubberBand"
+                // duration={1000}
+                // easing={'ease-out'}
+                iterationCount={10000}>
+                <Icon
+                  name="nfc"
+                  type="MaterialCommunityIcons"
+                  style={{color: 'white'}}></Icon>
+              </Animatable.View>
+            )
+          }
+        />
+
+        {/* <Header
           containerStyle={[
             {
               backgroundColor: MAIN_BLUE,
@@ -600,16 +626,16 @@ export const ActionModal = (props: actionModalProps) => {
             {props.headerTitle}
           </Text>
           <Animatable.View
-            animation="pulse"
-            duration={1000}
-            easing={'ease'}
-            iterationCount={100}>
+            animation="rubberBand"
+            // duration={1000}
+            // easing={'ease-out'}
+            iterationCount={10000}>
             <Icon
               name="nfc"
               type="MaterialCommunityIcons"
               style={{color: 'white'}}></Icon>
           </Animatable.View>
-        </Header>
+        </Header> */}
         <Content>
           <View
             style={{
