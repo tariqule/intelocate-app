@@ -38,6 +38,7 @@ function Item(data) {
     {label: 'New', value: 'NEW'},
     {label: 'Cancelled', value: 'CANCELLED'},
     {label: 'In Progress', value: 'INPROGRESS'},
+    {label: 'Complete', value: 'COMPLETE'},
   ];
   const changeSubstring = 30;
   const [val, setVal] = React.useState();

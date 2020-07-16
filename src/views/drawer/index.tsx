@@ -19,10 +19,13 @@ import {useNavigation} from '@react-navigation/native';
 import {retrieveUserInfo, storeToken} from '../../services/local-storage';
 import ActionIcon from '../../icons/ActionIcon';
 import LinearGradient from 'react-native-linear-gradient';
+import {userOrgId} from '../../redux/action/user';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 
 //TODO: get the user using redux to
 export function DrawerContent() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const [user, setUser] = React.useState('loading...');
   const [ab, setAb] = React.useState('');
@@ -34,6 +37,7 @@ export function DrawerContent() {
     setPressedDasboard(true);
     retrieveUserInfo().then((res) => {
       const abreviation = res.firstName.charAt(0) + res.lastName.charAt(0);
+      dispatch(userOrgId(res.organization.id));
       setUser(res.fullname);
       setAb(abreviation);
     });

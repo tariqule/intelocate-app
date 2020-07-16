@@ -3,11 +3,13 @@ import {View, Text, StyleSheet} from 'react-native';
 import {
   MAIN_GRAY,
   MAIN_DARK_ORANGE,
+  MAIN_RED,
   FormStyles,
   FormTextStyles,
   FormInputStyles,
   COLOR_BORDER,
   ACTIVE_BLUE,
+  MAIN_GREEN,
 } from '../../../../../config/global-styles';
 import DropDown from '../../../../../components/dropdown';
 // import {TextInput} from 'react-native-gesture-handler';
@@ -24,11 +26,23 @@ import {selectedAction} from '../../../../../redux/action/issue-action';
 
 export const PADDING_TOP = 10;
 
+export enum TaskPriority {
+  High = 2,
+  Medium = 1,
+  Low = 0,
+}
+export enum TaskStatus {
+  New = 'NEW',
+  Progress = 'INPROGRESS',
+  Complete = 'COMPLETE',
+}
+
 const ActionStatus = () => {
   const showStatus = [
     {label: 'New', value: 'NEW'},
     {label: 'Cancelled', value: 'CANCELLED'},
     {label: 'In Progress', value: 'INPROGRESS'},
+    {label: 'Complete', value: 'COMPLETE'},
   ];
   const [statusText, setStatusText] = React.useState();
   const [subStatus, setSubStatus] = React.useState('');
@@ -59,13 +73,59 @@ const ActionStatus = () => {
       dispatch(selectedAction(res.data)),
     );
   };
+  function GetPriority(value: TaskPriority) {
+    switch (value) {
+      case TaskPriority.Low:
+        return 'Low Priority';
+      case TaskPriority.Medium:
+        return 'Medium Priority';
+      case TaskPriority.High:
+        return 'High Priority';
+    }
+  }
+  function GetPriorityColor(value: TaskPriority) {
+    switch (value) {
+      case TaskPriority.Low:
+        return MAIN_GREEN;
+      case TaskPriority.Medium:
+        return MAIN_DARK_ORANGE;
+      case TaskPriority.High:
+        return MAIN_RED;
+    }
+  }
+  function GetStatusPercentage(value: TaskStatus) {
+    switch (value) {
+      case TaskStatus.New:
+        return '0%';
+      case TaskStatus.Progress:
+        return '33%';
+      case TaskStatus.Complete:
+        return '100%';
+    }
+  }
+  function GetStatusPercentageColor(value: TaskStatus) {
+    switch (value) {
+      case TaskStatus.New:
+        return 'transparent';
+      case TaskStatus.Progress:
+        return MAIN_DARK_ORANGE;
+      case TaskStatus.Complete:
+        return MAIN_GREEN;
+    }
+  }
+
   return (
     <View style={{}}>
       <View style={{...styles.priority}}>
         <View
-          style={{...styles.priorityBubble, backgroundColor: MAIN_DARK_ORANGE}}
+          style={{
+            ...styles.priorityBubble,
+            backgroundColor: GetPriorityColor(selected.priority),
+          }}
         />
-        <Text style={styles.priorityText}>Medium Priority</Text>
+        <Text style={styles.priorityText}>
+          {GetPriority(selected.priority)}
+        </Text>
       </View>
       <View
         style={{
@@ -75,10 +135,10 @@ const ActionStatus = () => {
         <View
           style={{
             ...styles.progress,
-            backgroundColor: MAIN_DARK_ORANGE,
+            backgroundColor: GetStatusPercentageColor(selected.status),
             height: MAIN_DARK_ORANGE ? 10 : 0,
             // width: `${progress.value}%`,
-            width: `60%`,
+            width: GetStatusPercentage(selected.status),
           }}
         />
       </View>

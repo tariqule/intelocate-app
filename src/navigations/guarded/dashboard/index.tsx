@@ -37,6 +37,7 @@ import {
   offline_organizations,
   offline_organizaton_location_list,
   report_issue_fn,
+  offline_organization_list,
 } from '../../../redux/action/offline';
 import {getCategories} from '../../../services/getCategories';
 import {getExternalUsers} from '../../../services/getUser';
@@ -296,6 +297,8 @@ export const ActionModal = (props: actionModalProps) => {
 
   const isConnected = useSelector((state) => state.network.isConnected);
 
+  // const getUserOrgId = useSelector((state) => state.userReducer.);
+
   const [organization, setOrganization] = React.useState(
     offlineOrganizationList,
   );
@@ -396,7 +399,26 @@ export const ActionModal = (props: actionModalProps) => {
     //     })[0],
     //   );
     // }
+    // if (isConnected) {
+    // retrieveUserInfo().then((res) => {
+    // setUserOrganization(res.organization.id);
 
+    // getListOrganizationWithLocation(
+    //   res.organization.id,
+    //   'CREATE_PROJECT',
+    //   (resOrg) => {
+    //     getListTenantsWithLocation((resTenants) => {
+    //       dispatch(
+    //         offline_organization_list([...resOrg.data, ...resTenants.data]),
+    //       );
+    //       setOrganization([...resOrg.data, ...resTenants.data]);
+    //     });
+
+    // setOrganization([...organization, ...res.data]);
+    //   },
+    // );
+    // });
+    // } else {
     setOrganization(
       offlineOrganizationsPacketData.map((e) => {
         let mapOrg = e._organizations
@@ -409,6 +431,8 @@ export const ActionModal = (props: actionModalProps) => {
         return [...mapOrg, ...mapTenant];
       })[0],
     );
+    // }
+
     console.log(
       JSON.stringify(
         offlineOrganizationsPacketData.map((e) => {
@@ -432,25 +456,6 @@ export const ActionModal = (props: actionModalProps) => {
     getExternalUsers((res) => {
       dispatch(offline_external_user_list(res.users));
       setExternalUsers(res.users);
-    });
-
-    retrieveUserInfo().then((res) => {
-      setUserOrganization(res.organization.id);
-
-      // getListOrganizationWithLocation(
-      //   res.organization.id,
-      //   'CREATE_PROJECT',
-      //   (resOrg) => {
-      //     getListTenantsWithLocation((resTenants) => {
-      //       dispatch(
-      //         offline_organization_list([...resOrg.data, ...resTenants.data]),
-      //       );
-      //       setOrganization([...resOrg.data, ...resTenants.data]);
-      //     });
-
-      //     // setOrganization([...organization, ...res.data]);
-      //   },
-      // );
     });
 
     // getListOrganization()

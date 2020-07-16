@@ -7,6 +7,7 @@ export const MAIN_BLUE = '#0c4176';
 export const MAIN_RED = '#ff5e5e';
 export const MAIN_DARK_ORANGE = '#f5a623';
 export const BLACK = '#000';
+export const MAIN_GREEN = '#46db1d';
 
 export const font_xs = 15;
 export const font_sm = 20;

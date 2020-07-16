@@ -205,6 +205,7 @@ const index = () => {
     {label: 'NEW', value: 'NEW'},
     {label: 'CANCELLED', value: 'CANCELLED'},
     {label: 'IN PROGRESS', value: 'INPROGRESS'},
+    {label: 'COMPLETE', value: 'COMPLETE'},
   ];
   const getCurrentActionList = () => {
     getCurrentStats();
