@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {Container, Header, Content, DatePicker, Text} from 'native-base';
-import {ACTIVE_BLUE} from '../../config/global-styles';
+import {ACTIVE_BLUE, MAIN_GRAY} from '../../config/global-styles';
 
 interface datePickerProps {
   onChange: (date) => void;
   disabled?: boolean;
   defaultDate?: any;
+  placeHolderText: string;
 }
 
 const DatePickerComponent = (props: datePickerProps) => {
@@ -23,15 +24,16 @@ const DatePickerComponent = (props: datePickerProps) => {
       modalTransparent={false}
       animationType={'fade'}
       androidMode={'default'}
-      placeHolderText="Select date"
+      placeHolderText={props.placeHolderText}
       textStyle={{
         color: ACTIVE_BLUE,
         borderBottomWidth: 1,
         borderColor: ACTIVE_BLUE,
       }}
-      placeHolderTextStyle={{color: '#d3d3d3'}}
+      placeHolderTextStyle={{color: MAIN_GRAY}}
       onDateChange={_setDate}
       disabled={disabled}
+      {...props}
     />
   );
 };

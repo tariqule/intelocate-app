@@ -13,11 +13,36 @@ import {getSpecificTask} from '../../../../services/getAction';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 import {selectedAction} from '../../../../redux/action/issue-action';
 import {deviceheight, deviceWidth} from '../../../../config/global-styles';
+import {getExternalUsers} from '../../../../services/getUser';
+import {setExternalUsers} from '../../../../redux/action/user';
+import {getAcctuals} from '../../../../services/accounting';
+import {getInvoices} from './actuals/utils';
+import {
+  setAcctualData,
+  setActualInvoice,
+  setOrganization,
+} from '../../../../redux/action/task';
+import {getAllOrganizations} from '../../../../services/organizations';
 
 const ActionInfo = ({route}) => {
   const {item} = route.params;
   const navigation = useNavigation();
   const [specificTask, setSpecificTask] = React.useState([]);
+  const [taskId, setTaskId] = React.useState<undefined | null | ''>();
+
+  const [actual, setActual] = React.useState<undefined | null | any>();
+  const [invoiceData, setInvoiceData] = React.useState<
+    undefined | null | any
+  >();
+  const [org, setOrg] = React.useState<undefined | null | any>();
+  const [externalUser, setExternalUsers] = React.useState<
+    undefined | null | any
+  >();
+  // const [taskId, setTaskId] = React.useState<undefined | null | any>();
+
+  const creatorName = actual && actual.map((actual) => actual.creatorName)[0];
+  const setVendorId = actual && actual.map((actual) => actual.vendorId)[0];
+  const finPeriod = actual && actual.map((actual) => actual.finPeriod)[0];
 
   const dispatch = useDispatch();
   const _onPressBackButton = () => {
@@ -28,7 +53,29 @@ const ActionInfo = ({route}) => {
     getSpecificTask(item.id, (res) => {
       console.log(JSON.stringify(res) + 'SBajs');
       dispatch(selectedAction(res.data));
+
       setSpecificTask(res.data);
+
+      getAcctuals(res.data.id, (res: any) => {
+        console.log(
+          JSON.stringify(res) + 'Acutual retrived *** [Action Detail-Index]',
+        );
+
+        if (res.actuals) {
+          setActual(res.actuals);
+          setAcctualData(res.actuals);
+          setInvoiceData(getInvoices(res.actuals).reverse());
+          setActualInvoice(getInvoices(res.actuals).reverse());
+        }
+      });
+    });
+    getAllOrganizations((res) => {
+      setOrganization(res);
+      setOrg(res);
+    });
+    getExternalUsers((res) => {
+      // dispatch(setExternalUsers(res.users));
+      setExternalUsers(res.users);
     });
   }, []);
   return (
@@ -45,6 +92,12 @@ const ActionInfo = ({route}) => {
           location={'specificTask.location'}
           category={specificTask.category && 'specificTask.category'}
           subCategory={'specificTask.subCategory && specificTask.subCategory'}
+          vendorData={invoiceData}
+          externalUsers={externalUser}
+          organizations={org}
+          creatorName={creatorName}
+          finPeriod={finPeriod}
+          actualData={actual}
         />
       </View>
     </View>

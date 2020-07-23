@@ -10,7 +10,7 @@ import LocationInfo from '../locationInfo';
 import Budget from '../budgets';
 import Actual from '../actuals';
 import {getSpecificTask} from '../../../../../services/getAction';
-
+import {useSelector} from 'react-redux';
 export const TabView = (props) => {
   const [specificTask, setSpecificTask] = React.useState(null);
 
@@ -30,7 +30,19 @@ export const TabView = (props) => {
       content: <LocationInfo />,
     },
     {title: 'Budget & Estimates:', content: <Budget />},
-    // {title: 'Actuals:', content: <Actual />},
+    {
+      title: 'Actuals:',
+      content: (
+        <Actual
+          vendorData={props.vendorData}
+          externalUsers={props.externalUsers}
+          organizations={props.organizations}
+          creatorName={props.creatorName}
+          finPeriod={props.finPeriod}
+          actualData={props.actualData}
+        />
+      ),
+    },
   ];
 
   return (

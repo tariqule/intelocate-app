@@ -27,7 +27,7 @@ import {
 import {Card, Divider} from 'react-native-elements';
 import {ChecklistIcon} from '../../../svg-components/checklist-icon';
 import {NavigationActionsIcon} from '../../../svg-components/navigation-actions';
-import {ACTION_INFO} from '../../../config/navigation-config';
+import {ACTION_INFO, REPORT_ISSUE} from '../../../config/navigation-config';
 import {getAction} from '../../../services/getAction';
 import {IconByCode} from '../../../svg-components/categories-icons/index';
 import OfflineMode from '../../../components/offline';
@@ -37,6 +37,7 @@ import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import {
   offline_action_list,
   report_issue_fn,
+  shouldDispatchOffline,
 } from '../../../redux/action/offline';
 import {ScrollView} from 'react-native-gesture-handler';
 import ActionButton from 'react-native-action-button';
@@ -47,6 +48,8 @@ import {Modal_PopUp} from '../../../components/popup';
 import {getStats} from '../../../services/getStats';
 import {actionStats, totalActionCount} from '../../../redux/action/stats';
 import {retrieveUserInfo} from '../../../services/local-storage';
+import NetInfo, {fetch} from '@react-native-community/netinfo';
+
 const index = () => {
   const navigation = useNavigation();
 
@@ -146,7 +149,11 @@ const index = () => {
   );
 
   const actionStatsCount = useSelector((state) => state.actionStats.totalCnt);
+  const getUserOrgId = useSelector((state) => state.userReducer.organizationId);
 
+  const refreshMode = useSelector(
+    (state) => state.reportIssue.shouldDispatchOfflineData,
+  );
   const [dbActionData, setDbActionData] = React.useState(offlineActionList);
   const [isLoading, setIsLoading] = React.useState(false);
   const [count, setCount] = React.useState(actionStatsCount || 0);
@@ -156,15 +163,16 @@ const index = () => {
   const [showPopup, setShowPopup] = React.useState(false);
   const [refreshingFullWindow, setRefreshingFullWindow] = React.useState(false);
   const [abortConnection, setAbortConnection] = React.useState(false);
+  const [fetchData, setFetchData] = React.useState(10);
 
   const getActionsParams = {
     index: 0,
-    // count: count,
+    count: fetchData,
     sort: 'recently_updated_desc',
   };
 
-  const getCurrentStats = () => {
-    getStats((res) => {
+  const getCurrentStats = async () => {
+    await getStats((res) => {
       console.log(
         JSON.stringify(res) +
           '===> Action Stats Retrieved. [Dashboard] [USE_EFFECT]',
@@ -182,7 +190,66 @@ const index = () => {
   };
 
   React.useEffect(() => {
-    if (isConnected && !abortConnection) {
+    // NetInfo.addEventListener((state) => {
+    //   console.log('Connection type', state.type);
+    //   console.log('Is connected?', state.isConnected);
+    //   console.log(
+    //     'dispatching................................................',
+    //   );
+
+    //   if (state.isConnected) {
+    //     // alert('offlineCount');
+    //     if (offlineCount === 1) {
+    //       alert('on');
+    //       dispatch(shouldDispatchOffline(false));
+    //       _onRefresh();
+
+    //       // getCurrentActionList();
+    //       setOfflineCount(0);
+    //     }
+    //   } else {
+    //     alert('pff');
+    //     // alert(offlineCount);
+    //     setOfflineCount(1);
+    //   }
+    // });
+    navigation.addListener('focus', () => {
+      NetInfo.fetch().then((state) => {
+        console.log('Connection type', state.type);
+        // alert('Is connected?' + state.isConnected);
+        if (state.isConnected) {
+          _onRefresh();
+        } else {
+        }
+      });
+      // if (isConnected) {
+      //   alert(isConnected);
+      // } else {
+      //   alert(isConnected);
+      // }
+      // NetInfo.addEventListener((state) => {
+      //   console.log('Connection type', state.type);
+      //   console.log('Is connected?', state.isConnected);
+      //   console.log(
+      //     'dispatching................................................',
+      //   );
+
+      //   if (state.isConnected) {
+      //     console.warn('...refreshing');
+      //     getCurrentStats();
+      //     // _onRefresh();
+      //   } else {
+      //     console.warn('0ff');
+      //   }
+      // });
+      // if (refreshMode) {
+      // console.log('refreshMode on -- dispatched' + refreshMode);
+      // } else {
+      // console.warn('refreshMode off -- ' + refreshMode);
+      // _onRefresh();
+      // }
+    });
+    if (isConnected) {
       getCurrentStats();
       setIsLoading(true);
       getAction(getActionsParams, (response) => {
@@ -195,9 +262,13 @@ const index = () => {
       console.warn('You are currently viewing offline.');
     }
     return function cleanup() {
-      return function cleanup() {
-        setAbortConnection(true);
-      };
+      navigation.addListener('focus', () => {});
+      navigation.removeListener('focus', () => {
+        console.log('focused');
+        _onRefresh();
+      });
+
+      // setAbortConnection(true);
     };
   }, []);
 
@@ -207,23 +278,57 @@ const index = () => {
     {label: 'IN PROGRESS', value: 'INPROGRESS'},
     {label: 'COMPLETE', value: 'COMPLETE'},
   ];
-  const getCurrentActionList = () => {
-    getCurrentStats();
+
+  const getCurrentActionList = async () => {
     setRefreshing(true);
-    getAction(getActionsParams, (response) => {
-      console.log(JSON.stringify(response));
-      setDbActionData(response.data);
-      console.log('releasing offline... ');
-      retrieveUserInfo().then((res) => {
-        dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
-        console.log('offline data released. ');
-      });
-      setRefreshing(false);
+
+    await retrieveUserInfo().then(async (res) => {
+      await dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
+      getCurrentStats();
+      await getAction(
+        getActionsParams,
+        async (response) => {
+          console.log(JSON.stringify(response));
+
+          setDbActionData(response.data);
+
+          setRefreshing(false);
+
+          console.log('releasing offline... ');
+        },
+        (err) => {
+          console.warn(err + '[ACTION] [OFFLINE-DISPATCH-ERROR]');
+          setRefreshing(false);
+          dispatch(shouldDispatchOffline(false));
+        },
+      );
     });
   };
-  const _onRefresh = () => {
+  const _onRefresh = async () => {
     if (isConnected) {
-      getCurrentActionList();
+      setRefreshing(true);
+
+      await retrieveUserInfo().then(async (res) => {
+        await dispatch(report_issue_fn(res.organization.id, offlineQueuedData));
+        getCurrentStats();
+        await getAction(
+          getActionsParams,
+          async (response) => {
+            console.log(JSON.stringify(response));
+
+            setDbActionData(response.data);
+
+            setRefreshing(false);
+
+            console.log('releasing offline... ');
+          },
+          (err) => {
+            console.warn(err + '[ACTION] [OFFLINE-DISPATCH-ERROR]');
+            setRefreshing(false);
+            dispatch(shouldDispatchOffline(false));
+          },
+        );
+      });
     } else {
       Alert.alert('Offline Mode', 'You are currently viewing offline.');
     }
@@ -239,8 +344,7 @@ const index = () => {
   }
   const dispatch = useDispatch();
   const _handleReportIssueButton = () => {
-    setModalVisibility(true);
-    setHeaderTitleState('Log Issue');
+    navigation.navigate(REPORT_ISSUE);
   };
   const _handleBack = () => {
     _cleanUp();
@@ -260,39 +364,42 @@ const index = () => {
       />
       {isLoading === false ? (
         <View>
-          <ScrollView
-            nestedScrollEnabled={true}
+          {/* <ScrollView nestedScrollEnabled={true}> */}
+          <FlatList
+            data={dbActionData}
+            onEndReached={() => {
+              setFetchData(fetchData + 10);
+              _onRefresh();
+            }}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={_onRefresh}></RefreshControl>
-            }>
-            <FlatList
-              data={dbActionData}
-              renderItem={({item}) => (
-                <CardItem
-                  key={item.id}
-                  title={item.name}
-                  name={item.location !== undefined ? item.location.name : ''}
-                  actionNumber={item.issueNumber}
-                  created={item.createdAt}
-                  status={getStatus(item.status)}
-                  iconCode={
-                    item.category &&
-                    item.category.iconCode && {
-                      code: item.category.iconCode,
-                      color: MAIN_GRAY,
-                    }
+            }
+            renderItem={({item}) => (
+              <CardItem
+                key={item.id}
+                title={item.name}
+                name={item.location !== undefined ? item.location.name : ''}
+                actionNumber={item.issueNumber}
+                created={item.createdAt}
+                status={getStatus(item.status)}
+                iconCode={
+                  item.category &&
+                  item.category.iconCode && {
+                    code: item.category.iconCode,
+                    color: MAIN_GRAY,
                   }
-                  onPress={() => {
-                    console.log(JSON.stringify(item));
-                    dispatch(selectedAction(item));
-                    navigation.navigate(ACTION_INFO, {item});
-                  }}
-                />
-              )}
-              keyExtractor={(item) => item.id}></FlatList>
-          </ScrollView>
+                }
+                onPress={() => {
+                  console.log(JSON.stringify(item));
+                  dispatch(selectedAction(item));
+                  navigation.navigate(ACTION_INFO, {item});
+                }}
+              />
+            )}
+            keyExtractor={(item) => item.id}></FlatList>
+          {/* </ScrollView> */}
           <ActionButton
             buttonColor={ACTIVE_BLUE}
             style={{
@@ -306,7 +413,7 @@ const index = () => {
             </ActionButton.Item>
           </ActionButton>
 
-          <ActionModal
+          {/* <ActionModal
             modalVisible={modalVisibility}
             onPressBackButton={_handleBack}
             headerTitle={headerTitleState}
@@ -318,8 +425,8 @@ const index = () => {
             }}
             // nfcLocationId={etagLocationId}
             loading={(refreshing) => setIsLoading(refreshing)}
-          />
-          {showPopup && (
+          /> */}
+          {/* {showPopup && (
             <Modal_PopUp
               isVisible={showPopup}
               title="Issue Submitted"
@@ -327,7 +434,7 @@ const index = () => {
                 (e) => e.issueNumber,
               )}`}
               onPress={() => setShowPopup(false)}></Modal_PopUp>
-          )}
+          )} */}
         </View>
       ) : (
         <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>

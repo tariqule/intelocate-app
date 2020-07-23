@@ -10,6 +10,7 @@ import {
   OFFLINE_ORGANIZATION_LOCATION,
   OFFLINE_EXTERNAL_USER_LOCATION,
   OFFLINE_ORGANIZATION,
+  SHOULD_DISPATCH_PFFLINE_DATA,
 } from '../../action/offline';
 
 const initialState = {
@@ -22,6 +23,7 @@ const initialState = {
   offlineOrganizationLocationList: [],
   offlineExternalUsersList: [],
   offlineOrganizations: [],
+  shouldDispatchOfflineData: false,
 };
 
 const reportIssue = (state = initialState, action) => {
@@ -94,6 +96,12 @@ const reportIssue = (state = initialState, action) => {
       return {
         ...state,
         offlineOrganizations: action.payload,
+      };
+    case SHOULD_DISPATCH_PFFLINE_DATA:
+      console.warn('from reducer ' + state.shouldDispatchOfflineData);
+      return {
+        ...state,
+        shouldDispatchOfflineData: action.payload,
       };
 
     default:

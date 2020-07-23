@@ -1,13 +1,8 @@
-import {OfflineQueue} from './../../../offline-queue/types';
-import {
-  CREATE_ACTION,
-  CREATE_ACTION_OFFLINE_QUEUE,
-  CLEAR_OFFLINE_QUEUE,
-  ACTION_SUBMIT_RESPONSE,
-} from '../../action/offline';
-import {SELECTED_ACTION} from '../../action/issue-action';
+import {SELECTED_ACTION, LOADING, DID_SUBMIT} from '../../action/issue-action';
 
 const initialState = {
+  loading: false,
+  didSubmit: false,
   selectedAction: [],
 };
 
@@ -21,6 +16,16 @@ const issueActon = (state = initialState, action) => {
       return {
         ...state,
         selectedAction: action.payload,
+      };
+    case LOADING:
+      return {
+        ...state,
+        loading: action.payload,
+      };
+    case DID_SUBMIT:
+      return {
+        ...state,
+        didSubmit: action.payload,
       };
 
     default:

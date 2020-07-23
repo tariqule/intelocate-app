@@ -9,6 +9,7 @@ import {
   ResetPassword,
   SplashScreen,
   ActionInfo,
+  ReportIssue,
 } from '../navigations';
 import {DrawerContent} from '../views/drawer';
 
@@ -21,6 +22,7 @@ export const RESET_SCREEN = 'RESET_SCREEN';
 export const DASHBOARD = 'DASHBOARD';
 export const ACTION = 'ACTION';
 export const ACTION_INFO = 'ACTION_INFO';
+export const REPORT_ISSUE = 'REPORT_ISSUE';
 
 function DrawerNavigator() {
   return (
@@ -46,6 +48,7 @@ function Navigator() {
         {/* <Drawer.Navigator initialRouteName={DASHBOARD}> */}
         <Stack.Screen name={DASHBOARD} component={DrawerNavigator} />
         <Stack.Screen name={ACTION_INFO} component={ActionInfo} />
+        <Stack.Screen name={REPORT_ISSUE} component={ReportIssue} />
 
         {/* </Drawer.Navigator> */}
       </Stack.Navigator>

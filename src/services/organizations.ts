@@ -18,7 +18,6 @@ export const getListOrganizationWithLocation = (
       `https://mobile.intelocate.com/api/list-organizations-with-locations/${tenantId}/${permission}`,
     )
     .then((res) => response(res))
-    .then()
     .catch((err) => console.log(err));
 };
 
@@ -36,5 +35,13 @@ export const getListLocationByOrganization = (orgId, response) => {
       console.log(JSON.stringify(res));
       response(res);
     })
+    .catch((err) => console.log(err));
+};
+
+export const getAllOrganizations = (response) => {
+  //mobile.intelocate.com/api/list-organizations/VIEW_ORGANIZATION
+  api
+    .get(`/list-organizations/VIEW_ORGANIZATION`)
+    .then((res) => response(res.data))
     .catch((err) => console.log(err));
 };

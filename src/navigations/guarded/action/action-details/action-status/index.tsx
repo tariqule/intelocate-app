@@ -23,7 +23,7 @@ import {updateAction} from '../../../../../services/getAction';
 import {onChange} from 'react-native-reanimated';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 import {selectedAction} from '../../../../../redux/action/issue-action';
-
+import moment from 'moment';
 export const PADDING_TOP = 10;
 
 export enum TaskPriority {
@@ -172,7 +172,12 @@ const ActionStatus = () => {
         <View style={{}}>
           <DatePicker
             onChange={(date) => _onChangeStartDate(date)}
-            defaultDate={selected.startDate}
+            placeHolderText={
+              selected.startDate
+                ? moment(selected.startDate).format('MM/DD/YYYY')
+                : 'Select date'
+            }
+            // defaultDate={selected.startDate}
           />
         </View>
       </View>
@@ -181,7 +186,12 @@ const ActionStatus = () => {
         <View style={{paddingBottom: PADDING_TOP}}>
           <DatePicker
             onChange={(date) => _onChangeEndDate(date)}
-            defaultDate={selected.dueDate}
+            placeHolderText={
+              selected.dueDate
+                ? moment(selected.dueDate).format('MM/DD/YYYY')
+                : 'Select date'
+            }
+            // defaultDate={selected.dueDate}
           />
         </View>
       </View>

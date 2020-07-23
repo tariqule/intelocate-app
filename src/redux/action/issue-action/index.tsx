@@ -1,15 +1,6 @@
-import {Queue} from './../../../offline-queue/queue';
-import {
-  queueStorage,
-  retrieveQueueStorage,
-} from './../../../services/local-storage/index';
-import Axios from 'axios';
-import {
-  checkInternetConnection,
-  offlineActionCreators,
-} from 'react-native-offline';
-
 export const SELECTED_ACTION = 'SELECTED_ACTION';
+export const LOADING = 'LOADING';
+export const DID_SUBMIT = 'DID_SUBMIT';
 
 type ActionToBeQueued = {
   type: string;
@@ -23,4 +14,14 @@ type ActionToBeQueued = {
 export const selectedAction = (issueResponse: ActionToBeQueued) => ({
   type: SELECTED_ACTION,
   payload: issueResponse,
+});
+
+export const loadingAction = (boolean) => ({
+  type: LOADING,
+  payload: boolean,
+});
+
+export const didSubmitAction = (boolean) => ({
+  type: DID_SUBMIT,
+  payload: boolean,
 });

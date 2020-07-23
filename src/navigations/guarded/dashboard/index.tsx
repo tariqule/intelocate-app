@@ -57,6 +57,8 @@ import Location from './location';
 import Status from './status';
 import {getStats} from '../../../services/getStats';
 import {actionStats, totalActionCount} from '../../../redux/action/stats';
+import {REPORT_ISSUE} from '../../../config/navigation-config';
+import NetInfo from '@react-native-community/netinfo';
 
 const dataArray = [
   {
@@ -112,17 +114,21 @@ const _renderContent = (item) => {
  */
 const dashboard = () => {
   const navigation = useNavigation();
+  const loadingAction = useSelector((state) => state.issueActon.loading);
+
+  const didSubmitAction = useSelector((state) => state.issueActon.didSubmit);
 
   const [modalVisibility, setModalVisibility] = React.useState(false);
   const [headerTitleState, setHeaderTitleState] = React.useState('');
-  const [showPopup, setShowPopup] = React.useState(false);
+  const [showPopup, setShowPopup] = React.useState(didSubmitAction);
   const [IssueNumber, setIssueNumber] = React.useState('');
   // const [nfcId, setNfcId] = React.useState();
   const [refreshComponent, setRefreshComponent] = React.useState(false);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(loadingAction);
   const [refreshingCom, setRefreshingCom] = React.useState(false);
   //etag
   const [etagLocationId, setEtagLocationId] = React.useState('');
+  const [offlineCount, setOfflineCount] = React.useState(0);
 
   const offlineQueuedData = useSelector(
     (state) => state.reportIssue.offlineData,
@@ -140,6 +146,19 @@ const dashboard = () => {
   const newLocal_1 = '[DASHBOARD] [REPORT_ISSUE_RESPONSE]';
 
   React.useEffect(() => {
+    // NetInfo.addEventListener((state) => {
+    //   console.log('Connection type', state.type);
+    //   console.log('Is connected?', state.isConnected);
+    //   if (state.isConnected) {
+    //     // if (offlineCount === 1) {
+    //     _onRefresh();
+    //     // setOfflineCount(0);
+    //     // }
+    //   } else {
+    //     // setOfflineCount(1);
+    //   }
+    // });
+
     getStats((res) => {
       console.log(
         JSON.stringify(res) +
@@ -178,7 +197,9 @@ const dashboard = () => {
   };
 
   const _handleReportIssueButton = () => {
-    setModalVisibility(true);
+    // setModalVisibility(true);
+    navigation.navigate(REPORT_ISSUE);
+
     setHeaderTitleState('Log Issue');
   };
   const _onRefresh = () => {
@@ -238,7 +259,7 @@ const dashboard = () => {
         </ActionButton.Item>
       </ActionButton>
 
-      <ActionModal
+      {/* <ActionModal
         modalVisible={modalVisibility}
         onPressBackButton={_handleBack}
         headerTitle={headerTitleState}
@@ -249,21 +270,21 @@ const dashboard = () => {
         }}
         // nfcLocationId={etagLocationId}
         loading={(refreshing) => setRefreshing(refreshing)}
-      />
-      {showPopup && (
+      /> */}
+      {/* {showPopup && (
         <Modal_PopUp
           isVisible={showPopup}
           title="Issue Submitted"
           issueNumber={`Issue #${submitIssueResponse}`}
           onPress={() => setShowPopup(false)}></Modal_PopUp>
-      )}
+      )} */}
     </Container>
   );
 };
 export default dashboard;
 
 /***********************************************************************
- * @FLOATING_ACTION_MODAL
+ * @FLOATING_ACTION_MODAL @NOT_USED ************************************
  ***********************************************************************/
 
 interface actionModalProps {
@@ -297,7 +318,7 @@ export const ActionModal = (props: actionModalProps) => {
 
   const isConnected = useSelector((state) => state.network.isConnected);
 
-  // const getUserOrgId = useSelector((state) => state.userReducer.);
+  const getUserOrgId = useSelector((state) => state.userReducer.organizationId);
 
   const [organization, setOrganization] = React.useState(
     offlineOrganizationList,
@@ -399,39 +420,39 @@ export const ActionModal = (props: actionModalProps) => {
     //     })[0],
     //   );
     // }
-    // if (isConnected) {
-    // retrieveUserInfo().then((res) => {
-    // setUserOrganization(res.organization.id);
+    if (isConnected) {
+      // retrieveUserInfo().then((res) => {
+      setUserOrganization(getUserOrgId);
 
-    // getListOrganizationWithLocation(
-    //   res.organization.id,
-    //   'CREATE_PROJECT',
-    //   (resOrg) => {
-    //     getListTenantsWithLocation((resTenants) => {
-    //       dispatch(
-    //         offline_organization_list([...resOrg.data, ...resTenants.data]),
-    //       );
-    //       setOrganization([...resOrg.data, ...resTenants.data]);
-    //     });
+      getListOrganizationWithLocation(
+        getUserOrgId,
+        'CREATE_PROJECT',
+        (resOrg) => {
+          getListTenantsWithLocation((resTenants) => {
+            dispatch(
+              offline_organization_list([...resOrg.data, ...resTenants.data]),
+            );
+            setOrganization([...resOrg.data, ...resTenants.data]);
+          });
 
-    // setOrganization([...organization, ...res.data]);
-    //   },
-    // );
-    // });
-    // } else {
-    setOrganization(
-      offlineOrganizationsPacketData.map((e) => {
-        let mapOrg = e._organizations
-          .map((v) => {
-            return {id: v.id, name: v.name, locations: v._locations};
-          })
-          .flatMap((e) => e);
+          // setOrganization([...organization, ...res.data]);
+        },
+      );
+      // });
+    } else {
+      setOrganization(
+        offlineOrganizationsPacketData.map((e) => {
+          let mapOrg = e._organizations
+            .map((v) => {
+              return {id: v.id, name: v.name, locations: v._locations};
+            })
+            .flatMap((e) => e);
 
-        let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
-        return [...mapOrg, ...mapTenant];
-      })[0],
-    );
-    // }
+          let mapTenant = [{id: e.id, name: e.name, locations: e._locations}];
+          return [...mapOrg, ...mapTenant];
+        })[0],
+      );
+    }
 
     console.log(
       JSON.stringify(

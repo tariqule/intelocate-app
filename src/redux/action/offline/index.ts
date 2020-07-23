@@ -21,6 +21,7 @@ export const OFFLINE_ORGANIZATION_LIST = 'OFFLINE_ORGANIZATION_LIST';
 export const OFFLINE_ORGANIZATION_LOCATION = 'OFFLINE_ORGANIZATION_LOCATION';
 export const OFFLINE_EXTERNAL_USER_LOCATION = 'OFFLINE_EXTERNAL_USER_LOCATION';
 export const OFFLINE_ORGANIZATION = 'OFFLINE_ORGANIZATION';
+export const SHOULD_DISPATCH_PFFLINE_DATA = 'SHOULD_DISPATCH_PFFLINE_DATA';
 
 type ActionToBeQueued = {
   type: string;
@@ -75,6 +76,10 @@ export const offline_organizations = (actionData: any) => ({
   type: OFFLINE_ORGANIZATION,
   payload: actionData,
 });
+export const shouldDispatchOffline = (actionData: any) => ({
+  type: SHOULD_DISPATCH_PFFLINE_DATA,
+  payload: actionData,
+});
 
 export const report_issue_fn = (useOrganizationID: string, params?: any) => {
   function thunk(dispatch, getState) {
@@ -86,69 +91,67 @@ export const report_issue_fn = (useOrganizationID: string, params?: any) => {
 
     //   dispatch(otpAction.loading());
 
-    checkInternetConnection(
-      'https://spinmetry.intelocate.com/',
-      20000,
-      true,
-    ).then((isConnected) => {
-      console.log(isConnected + '[redux] [thunk]');
-      dispatch(connectionChange(isConnected));
-      isConnected
-        ? Axios.post(
-            `https://mobile.intelocate.com/api/tasks/${useOrganizationID}`,
-            params,
-          )
-            .then((res) => {
-              console.log(
-                JSON.stringify(res) +
-                  ' ===> response received [redux] [offline] submitted.',
-              );
+    checkInternetConnection('https://google.com', 20000, true).then(
+      (isConnected) => {
+        console.log(isConnected + '[redux] [thunk]');
+        dispatch(connectionChange(isConnected));
+        isConnected
+          ? Axios.post(
+              `https://mobile.intelocate.com/api/tasks/${useOrganizationID}`,
+              params,
+            )
+              .then((res) => {
+                console.log(
+                  JSON.stringify(res) +
+                    ' ===> response received [redux] [offline] submitted.',
+                );
 
-              dispatch(clear_queue());
-              dispatch(issue_submit_response(res.data));
-              queueStorage({});
-            })
-            .catch((err) => {
-              queueStorage({});
-              dispatch(clear_queue());
-              console.log(err + ' [ERROR in offline action] [REDUX]');
-              // dispatch(otpAction.otpRequestFailure());
-            })
-        : retrieveQueueStorage()
-            .then((queuedTask) => {
-              // let allUserInfo = {
-              //   tasks: [...queuedTask.tasks, ...params.tasks],
-              // };
-              // let allUserInfo = {...queuedTask, ...params};
-              let allUserInfo =
+                dispatch(clear_queue());
+                dispatch(issue_submit_response(res.data));
+                queueStorage({});
+              })
+              .catch((err) => {
+                queueStorage({});
+                dispatch(clear_queue());
+                console.log(err + ' [ERROR in offline action] [REDUX]');
+                // dispatch(otpAction.otpRequestFailure());
+              })
+          : retrieveQueueStorage()
+              .then((queuedTask) => {
+                // let allUserInfo = {
+                //   tasks: [...queuedTask.tasks, ...params.tasks],
+                // };
+                // let allUserInfo = {...queuedTask, ...params};
+                let allUserInfo =
+                  queuedTask.tasks !== undefined
+                    ? queuedTask.tasks.push(params.tasks)
+                    : params;
+
                 queuedTask.tasks !== undefined
-                  ? queuedTask.tasks.push(params.tasks)
-                  : params;
+                  ? console.warn(
+                      JSON.stringify(queuedTask) +
+                        'all offline data [Redux] [offline]',
+                    )
+                  : console.warn(
+                      JSON.stringify(allUserInfo) +
+                        'all offline data [Redux] [offline]',
+                    );
 
-              queuedTask.tasks !== undefined
-                ? console.warn(
-                    JSON.stringify(queuedTask) +
-                      'all offline data [Redux] [offline]',
-                  )
-                : console.warn(
-                    JSON.stringify(allUserInfo) +
-                      'all offline data [Redux] [offline]',
-                  );
-
-              if (queuedTask.tasks !== undefined) {
-                queueStorage(queuedTask);
-                dispatch(report_issue(queuedTask));
-              } else {
-                queueStorage(allUserInfo);
-                dispatch(report_issue(allUserInfo));
-              }
-              // queueStorage(allUserInfo);
-              // dispatch(report_issue(allUserInfo));
-            })
-            .catch((err) => {
-              console.warn(err);
-            });
-    });
+                if (queuedTask.tasks !== undefined) {
+                  queueStorage(queuedTask);
+                  dispatch(report_issue(queuedTask));
+                } else {
+                  queueStorage(allUserInfo);
+                  dispatch(report_issue(allUserInfo));
+                }
+                // queueStorage(allUserInfo);
+                // dispatch(report_issue(allUserInfo));
+              })
+              .catch((err) => {
+                console.warn(err);
+              });
+      },
+    );
   }
   thunk.interceptInOffline = true;
 

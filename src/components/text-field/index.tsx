@@ -29,6 +29,7 @@ const TextField = (props: Props) => {
           <Text style={styles.inputHeader}>{data.title}</Text>
           <View style={{}}>
             <Input
+              onBlur={data.onBlur}
               // containerStyle={{width: '100%'}}
               inputContainerStyle={{borderColor: ACTIVE_BLUE}}
               inputStyle={{color: MAIN_GRAY}}

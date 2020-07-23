@@ -1,16 +1,17 @@
 import {api} from './api';
 import Axios from 'axios';
 
-export const getAction = (params, reposnse) => {
+export const getAction = async (params, reposnse, error?) => {
   console.log(
     JSON.stringify(params) + 'dta to be sent to db [get Action Service',
   );
-  api
+  await api
     .post('/list-tasks', params)
     .then((response) => reposnse(response))
-    .catch((err) =>
-      console.log(JSON.stringify(err) + 'Error: [get Action Service]'),
-    );
+    .catch((err) => {
+      error(err);
+      console.log(JSON.stringify(err) + 'Error: [get Action Service]');
+    });
 };
 export const getDashboardAction = (params, reposnse) => {
   console.log(

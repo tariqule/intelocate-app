@@ -1,7 +1,7 @@
 import {api} from './api';
 
-export const getStats = (reposnse) => {
-  api
+export const getStats = async (reposnse) => {
+  await api
     .post('/dashboard/task-status-stat')
     .then((response) => reposnse(response))
     .catch((err) =>
