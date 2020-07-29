@@ -1,4 +1,4 @@
-import {toDateWithUTCTime, toUTCString} from './../../../../../utils/datetime';
+import {toDateWithUTCTime, toUTCString} from '../../../../../../utils/datetime';
 import * as sortBy from 'lodash/sortBy';
 import * as findLastIndex from 'lodash/findLastIndex';
 import {TaskCostOptions} from '@intelocate/api-services';

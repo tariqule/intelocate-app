@@ -1,7 +1,10 @@
 import React from 'react';
 import {View, Text} from 'react-native';
-import {FormStyles, FormTextStyles} from '../../../../../config/global-styles';
-import Location from '../../../dashboard/location';
+import {
+  FormStyles,
+  FormTextStyles,
+} from '../../../../../../config/global-styles';
+import Location from '../../../../dashboard/location';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
 
 const LocationInfo = (props) => {

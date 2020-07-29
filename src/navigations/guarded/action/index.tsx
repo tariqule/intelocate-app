@@ -1,54 +1,49 @@
+import NetInfo from '@react-native-community/netinfo';
+import {DrawerActions, useNavigation} from '@react-navigation/native';
+import {Icon} from 'native-base';
 import React from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Platform,
+  RefreshControl,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  FlatList,
-  ActivityIndicator,
-  RefreshControl,
-  Alert,
-  Platform,
-  StyleSheet,
+  View,
 } from 'react-native';
+import ActionButton from 'react-native-action-button';
+import {Card, Divider} from 'react-native-elements';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import HeaderComponent from '../../../components/header';
-import {NavigationDashboardIcon} from '../../../svg-components/navigation-dashboard';
-import {useNavigation, DrawerActions} from '@react-navigation/native';
+import {_cleanUp} from '../../../components/nfc';
+import OfflineMode from '../../../components/offline';
 import {
-  MAIN_GRAY,
-  COLOR_BORDER,
   ACTIVE_BLUE,
-  font_md,
-  font_sm,
   BLACK,
+  COLOR_BORDER,
+  font_sm,
   font_xs,
+  MAIN_GRAY,
   MAIN_RED,
   TEST_BORDER,
 } from '../../../config/global-styles';
-import {Card, Divider} from 'react-native-elements';
-import {ChecklistIcon} from '../../../svg-components/checklist-icon';
-import {NavigationActionsIcon} from '../../../svg-components/navigation-actions';
 import {ACTION_INFO, REPORT_ISSUE} from '../../../config/navigation-config';
-import {getAction} from '../../../services/getAction';
-import {IconByCode} from '../../../svg-components/categories-icons/index';
-import OfflineMode from '../../../components/offline';
 import {selectedAction} from '../../../redux/action/issue-action';
-import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
-import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import {
   offline_action_list,
   report_issue_fn,
   shouldDispatchOffline,
 } from '../../../redux/action/offline';
-import {ScrollView} from 'react-native-gesture-handler';
-import ActionButton from 'react-native-action-button';
-import {Icon} from 'native-base';
-import {ActionModal} from '../dashboard/index';
-import {_cleanUp} from '../../../components/nfc';
-import {Modal_PopUp} from '../../../components/popup';
-import {getStats} from '../../../services/getStats';
 import {actionStats, totalActionCount} from '../../../redux/action/stats';
+import {getAction} from '../../../services/getAction';
+import {getStats} from '../../../services/getStats';
 import {retrieveUserInfo} from '../../../services/local-storage';
-import NetInfo, {fetch} from '@react-native-community/netinfo';
+import {IconByCode} from '../../../svg-components/categories-icons/index';
+import {ChecklistIcon} from '../../../svg-components/checklist-icon';
+import {NavigationActionsIcon} from '../../../svg-components/navigation-actions';
 
 const index = () => {
   const navigation = useNavigation();

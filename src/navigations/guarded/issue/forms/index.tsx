@@ -135,8 +135,6 @@ const FormX = (props: FormProps) => {
                     <RadioBUttonGroup
                       onPress={(val, id) => {
                         setRadioButtonId({[id]: val});
-                        //   alert(JSON.stringify(radioButtonId));
-                        let parentId = 'a7d16744-3b2c-48cf-8ee9-b8ca60466d4c';
                         props.auditForm({
                           'a7d16744-3b2c-48cf-8ee9-b8ca60466d4c': {
                             '25b1c4bb-bed5-464b-b9af-14a481177088': 'false',

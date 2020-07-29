@@ -6,11 +6,11 @@ import {
   MAIN_GRAY,
   ACTIVE_BLUE,
   COLOR_BORDER,
-} from '../../../../../../config/global-styles';
+} from '../../../../../../../config/global-styles';
 import {Input} from 'react-native-elements';
 import {ActualItem} from '../types';
 import {Currency, formatCost} from '../utils';
-import {updateInvoice} from '../../../../../../services/accounting';
+import {updateInvoice} from '../../../../../../../services/accounting';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 interface invoiceGridProps {
   invoicedata: any;

@@ -4,17 +4,17 @@ import {
   FormStyles,
   FormTextStyles,
   ACTIVE_BLUE,
-} from '../../../../../config/global-styles';
-import DropDown from '../../../../../components/dropdown';
+} from '../../../../../../config/global-styles';
+import DropDown from '../../../../../../components/dropdown';
 import {PADDING_TOP} from '../action-status';
 import {
   getCategories,
   getSubCategories,
-} from '../../../../../services/getCategories';
+} from '../../../../../../services/getCategories';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
-import {updateAction} from '../../../../../services/getAction';
-import {selectedAction} from '../../../../../redux/action/issue-action';
+import {updateAction} from '../../../../../../services/getAction';
+import {selectedAction} from '../../../../../../redux/action/issue-action';
 
 const ProjectDetails = (props) => {
   const [categories, setCategories] = React.useState(props.category || []);

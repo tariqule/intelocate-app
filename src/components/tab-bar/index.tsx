@@ -2,6 +2,8 @@ import {Button, TouchableOpacity} from 'react-native';
 import {MAIN_BLUE, MAIN_GRAY} from '../../config/global-styles';
 import {Icon} from 'native-base';
 import {ChecklistIcon} from '../../svg-components/checklist-icon';
+import {HomeIcon} from '../../svg-components/home-icon';
+import {UserIcon} from '../../svg-components/user-icon';
 const React = require('react');
 const {ViewPropTypes} = (ReactNative = require('react-native'));
 const PropTypes = require('prop-types');
@@ -157,7 +159,11 @@ const ScrollableTabBar = createReactClass({
         onLayout={onLayoutHandler}
         onPress={() => onPressHandler(page)}
         style={styles.tab}>
-        {name === 'checklist' ? (
+        {name === 'user' ? (
+          <View style={{width: 30}}>
+            <UserIcon color={textColor} />
+          </View>
+        ) : name === 'checklist' ? (
           <View style={{width: 30}}>
             <ChecklistIcon color={textColor} />
           </View>
@@ -168,6 +174,16 @@ const ScrollableTabBar = createReactClass({
             type={name === 'nfc' ? 'MaterialCommunityIcons' : 'Ionicons'}
           />
         )}
+        {/* {name === 'home' && (
+          <View style={{width: 30}}>
+            <HomeIcon color={textColor} />
+          </View>
+        )}
+        {name === 'user' && (
+          <View style={{width: 30}}>
+            <UserIcon color={textColor} />
+          </View>
+        )} */}
       </TouchableOpacity>
     );
   },

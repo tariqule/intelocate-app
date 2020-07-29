@@ -14,3 +14,15 @@ export const getExternalUsers = (response) => {
     .then((res) => response(res.data))
     .then((err) => console.log(err));
 };
+
+export const getTaskForUsers = (taskID, response) => {
+  api.defaults.withCredentials;
+  const config = {
+    headers: {Accept: `*/*`, 'Content-Type': 'application/json;charset=UTF-8'},
+  };
+
+  api
+    .get(`users/task-tree/${taskID}`, config)
+    .then((res) => response(res.data))
+    .then((err) => console.log(err));
+};

@@ -1,28 +1,23 @@
-import React from 'react';
-import {View, Text, Dimensions} from 'react-native';
-import HeaderX from '../../../../components/headerX';
 import {useNavigation} from '@react-navigation/native';
-import ActionHeader from '../../../../components/action-header';
-import ScrollableTabView, {
-  ScrollableTabBar,
-} from 'react-native-scrollable-tab-view';
-import {Icon} from 'native-base';
-import {TabView} from './tab-view';
+import React from 'react';
+import {View} from 'react-native';
 import {Divider} from 'react-native-elements';
-import {getSpecificTask} from '../../../../services/getAction';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
-import {selectedAction} from '../../../../redux/action/issue-action';
+import ActionHeader from '../../../../components/action-header';
+import HeaderX from '../../../../components/headerX';
 import {deviceheight, deviceWidth} from '../../../../config/global-styles';
-import {getExternalUsers} from '../../../../services/getUser';
-import {setExternalUsers} from '../../../../redux/action/user';
-import {getAcctuals} from '../../../../services/accounting';
-import {getInvoices} from './actuals/utils';
+import {selectedAction} from '../../../../redux/action/issue-action';
 import {
   setAcctualData,
   setActualInvoice,
   setOrganization,
 } from '../../../../redux/action/task';
+import {getAcctuals} from '../../../../services/accounting';
+import {getSpecificTask} from '../../../../services/getAction';
+import {getExternalUsers} from '../../../../services/getUser';
 import {getAllOrganizations} from '../../../../services/organizations';
+import {getInvoices} from './home/actuals/utils';
+import {TabView} from './tab-view';
 
 const ActionInfo = ({route}) => {
   const {item} = route.params;

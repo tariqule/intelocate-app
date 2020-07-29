@@ -1,10 +1,10 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import TextField from '../../../../../components/text-field';
+import TextField from '../../../../../../components/text-field';
 import {useSelector} from 'react-redux';
-import {updateAction} from '../../../../../services/getAction';
+import {updateAction} from '../../../../../../services/getAction';
 import {useDispatch} from 'react-redux';
-import {selectedAction} from '../../../../../redux/action/issue-action';
+import {selectedAction} from '../../../../../../redux/action/issue-action';
 const Budget = (props) => {
   const dispatch = useDispatch();
   const selected = useSelector((state) => state.issueActon.selectedAction);

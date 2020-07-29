@@ -1,30 +1,28 @@
 import React from 'react';
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
-
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Avatar} from 'react-native-elements';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import ScrollableTabBar from '../../../../../components/tab-bar/index';
-import AccordianX from '../../../../../components/accordianX';
-import ActionStatus from '../action-status';
-import ProjectInfo from '../project-info';
-import LocationInfo from '../locationInfo';
-import Budget from '../budgets';
-import Actual from '../actuals';
-import {getSpecificTask} from '../../../../../services/getAction';
 import {useSelector} from 'react-redux';
-import {ChecklistIcon} from '../../../../../svg-components/checklist-icon';
+import AccordianX from '../../../../../components/accordianX';
+import ScrollableTabBar from '../../../../../components/tab-bar/index';
 import {
-  MAIN_GRAY,
-  COLOR_BORDER,
-  MAIN_GREEN,
-  MAIN_BLUE,
-  font_sm,
   font_xs,
+  MAIN_BLUE,
+  MAIN_GRAY,
+  MAIN_GREEN,
 } from '../../../../../config/global-styles';
-import {getFormForIssue, getFilesForIssue} from '../../../../../services/issue';
+import {getFilesForIssue, getFormForIssue} from '../../../../../services/issue';
 import {CheckedIcon} from '../../../../../svg-components/checked-icon';
 import FormX from '../../../issue/forms';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {Avatar} from 'react-native-elements';
+import Actual from '../home/actuals';
+import ActionStatus from '../home/action-status';
+import Budget from '../home/budgets';
+import LocationInfo from '../home/locationInfo';
+import ProjectInfo from '../home/project-info';
+import CheckList from '../check-list';
+import User from '../user';
+
 export const TabView = (props) => {
   const selected = useSelector((state) => state.issueActon.selectedAction);
 
@@ -101,65 +99,16 @@ export const TabView = (props) => {
         </View>
       </ScrollView>
       <ScrollView tabLabel="checklist" style={styles.tabView}>
-        <View style={styles.checkListCard}>
-          {specificTaskForm !== undefined &&
-          specificTaskForm &&
-          specificTaskForm.forms &&
-          specificTaskForm.forms.length !== 0 ? (
-            <TouchableOpacity onPress={_onPressFormCheckList}>
-              <View style={{alignItems: 'center'}}>
-                <View
-                  style={{
-                    height: 40,
-                    width: 40,
-                    padding: 4,
-                    borderRadius: 100,
-                    backgroundColor: MAIN_GREEN,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    // padding: 12,
-                  }}>
-                  <View style={{height: 20, width: 20}}>
-                    <CheckedIcon color={'white'} />
-                  </View>
-                </View>
-                <Text style={{color: MAIN_GRAY}}>
-                  {specificTaskForm === undefined
-                    ? ''
-                    : specificTaskForm.forms[0].title}
-                </Text>
-                <Text style={{color: MAIN_GRAY, fontSize: 10}}>
-                  (Submitted)
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <Text style={{color: MAIN_GRAY, fontSize: 10}}>
-              There are no checklists
-            </Text>
-          )}
-        </View>
-        <FormX
-          auditForm={(formData) => setFormData(formData)}
-          merchandisingForm={(formData) => setFormData(formData)}
-          isFormFilled={(boolean) => setIsFormDone(boolean)}
-          isFormComplete={(boolean) => setIsFormDone(boolean)}
-          isModalVisible={showForm}
-          title={
-            loading === false
-              ? specificTaskForm.forms.length > 0
-                ? specificTaskForm.forms[0].title
-                : ''
-              : ''
-          }
-          onBackButtonPress={() => setShowForm(false)}
-        />
+        <CheckList />
       </ScrollView>
 
       <ScrollView tabLabel="ios-chatboxes" style={styles.tabView}>
         <View style={styles.card}>
           <Text>Messenger</Text>
         </View>
+      </ScrollView>
+      <ScrollView tabLabel="user" style={styles.tabView}>
+        <User />
       </ScrollView>
       <ScrollView tabLabel="ios-attach" style={styles.tabView}>
         {filesData &&

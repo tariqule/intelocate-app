@@ -1,29 +1,21 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {
-  MAIN_GRAY,
-  MAIN_DARK_ORANGE,
-  MAIN_RED,
-  FormStyles,
-  FormTextStyles,
-  FormInputStyles,
-  COLOR_BORDER,
-  ACTIVE_BLUE,
-  MAIN_GREEN,
-} from '../../../../../config/global-styles';
-import DropDown from '../../../../../components/dropdown';
-// import {TextInput} from 'react-native-gesture-handler';
-// import {DatePicker} from '../../../../components/date-picker';
-import {TextInput} from 'react-native-gesture-handler';
-import {Input} from 'react-native-elements';
-
-import DatePicker from '../../../../../components/date-picker';
-import {useSelector} from 'react-redux/lib/hooks/useSelector';
-import {updateAction} from '../../../../../services/getAction';
-import {onChange} from 'react-native-reanimated';
-import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
-import {selectedAction} from '../../../../../redux/action/issue-action';
 import moment from 'moment';
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {Input} from 'react-native-elements';
+import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
+import {useSelector} from 'react-redux/lib/hooks/useSelector';
+import DatePicker from '../../../../../../components/date-picker';
+import DropDown from '../../../../../../components/dropdown';
+import {
+  ACTIVE_BLUE,
+  MAIN_DARK_ORANGE,
+  MAIN_GRAY,
+  MAIN_GREEN,
+  MAIN_RED,
+} from '../../../../../../config/global-styles';
+import {selectedAction} from '../../../../../../redux/action/issue-action';
+import {updateAction} from '../../../../../../services/getAction';
+
 export const PADDING_TOP = 10;
 
 export enum TaskPriority {
