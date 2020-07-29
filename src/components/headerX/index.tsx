@@ -40,7 +40,7 @@ const HeaderX = (props: HeaderProps) => {
     <Header
       style={{backgroundColor: MAIN_BLUE}}
       androidStatusBarColor={MAIN_BLUE}>
-      <Left>
+      <Left style={{flex: 1}}>
         <Button transparent {...props}>
           <Icon
             name={props.iconName || 'arrow-back'}
@@ -49,7 +49,7 @@ const HeaderX = (props: HeaderProps) => {
           />
         </Button>
       </Left>
-      <Body>
+      <Body style={{flex: 3}}>
         <Title>{props.title}</Title>
       </Body>
       <Right>{props.rightComponent}</Right>

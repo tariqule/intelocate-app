@@ -95,6 +95,72 @@ export const report_issue_fn = (useOrganizationID: string, params?: any) => {
       (isConnected) => {
         console.log(isConnected + '[redux] [thunk]');
         dispatch(connectionChange(isConnected));
+
+        // if (params.files.length !== 0) {
+        //   var bodyFormData = new FormData();
+        //   bodyFormData.append('tasks', params.tasks);
+        //   bodyFormData.append('files', params.files);
+
+        //   isConnected
+        //     ? Axios.post({
+        //         method: 'post',
+        //         url: `https://mobile.intelocate.com/api/tasks/${useOrganizationID}`,
+        //         data: bodyFormData,
+        //         headers: {'Content-Type': 'multipart/form-data'},
+        //       })
+        //         .then((res) => {
+        //           console.log(
+        //             JSON.stringify(res) +
+        //               ' ===> response received [redux] [offline] submitted.',
+        //           );
+
+        //           dispatch(clear_queue());
+        //           dispatch(issue_submit_response(res.data));
+        //           queueStorage({});
+        //         })
+        //         .catch((err) => {
+        //           queueStorage({});
+        //           dispatch(clear_queue());
+        //           console.log(err + ' [ERROR in offline action] [REDUX]');
+        //           // dispatch(otpAction.otpRequestFailure());
+        //         })
+        //     : retrieveQueueStorage()
+        //         .then((queuedTask) => {
+        //           // let allUserInfo = {
+        //           //   tasks: [...queuedTask.tasks, ...params.tasks],
+        //           // };
+        //           // let allUserInfo = {...queuedTask, ...params};
+        //           let allUserInfo =
+        //             queuedTask.tasks !== undefined
+        //               ? queuedTask.tasks.push(params.tasks)
+        //               : params;
+
+        //           queuedTask.tasks !== undefined
+        //             ? console.warn(
+        //                 JSON.stringify(queuedTask) +
+        //                   'all offline data [Redux] [offline]',
+        //               )
+        //             : console.warn(
+        //                 JSON.stringify(allUserInfo) +
+        //                   'all offline data [Redux] [offline]',
+        //               );
+
+        //           if (queuedTask.tasks !== undefined) {
+        //             queueStorage(queuedTask);
+        //             dispatch(report_issue(queuedTask));
+        //           } else {
+        //             queueStorage(allUserInfo);
+        //             dispatch(report_issue(allUserInfo));
+        //           }
+        //           // queueStorage(allUserInfo);
+        //           // dispatch(report_issue(allUserInfo));
+        //         })
+        //         .catch((err) => {
+        //           console.warn(err);
+        //         });
+        // }
+
+        // if (params.files.length === 0) {
         isConnected
           ? Axios.post(
               `https://mobile.intelocate.com/api/tasks/${useOrganizationID}`,
@@ -150,6 +216,7 @@ export const report_issue_fn = (useOrganizationID: string, params?: any) => {
               .catch((err) => {
                 console.warn(err);
               });
+        // }
       },
     );
   }

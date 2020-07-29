@@ -1,29 +1,22 @@
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-import {Accordion, Button, Container, Content, Footer, Icon} from 'native-base';
+import {Accordion, Container, Content, Icon} from 'native-base';
 import React from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Modal,
   Platform,
   RefreshControl,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
-import * as Animatable from 'react-native-animatable';
-import {Divider, Input} from 'react-native-elements';
+import {Divider} from 'react-native-elements';
 import {useDispatch} from 'react-redux/lib/hooks/useDispatch';
 import {useSelector} from 'react-redux/lib/hooks/useSelector';
-import CategoryCard from '../../../components/categories-card';
-import DropDownX from '../../../components/dropdown';
 import HeaderComponent from '../../../components/header';
-import HeaderX from '../../../components/headerX';
-import {_cleanUp, _NfcOn} from '../../../components/nfc';
+import {_cleanUp} from '../../../components/nfc';
 import OfflineMode from '../../../components/offline';
-import {Modal_PopUp} from '../../../components/popup';
 import {
   ACTIVE_BLUE,
   COLOR_BORDER,
@@ -31,34 +24,21 @@ import {
   MAIN_RED,
   TEST_BORDER,
 } from '../../../config/global-styles';
+import {REPORT_ISSUE} from '../../../config/navigation-config';
 import {
-  offline_category_list,
-  offline_external_user_list,
   offline_organizations,
-  offline_organizaton_location_list,
   report_issue_fn,
-  offline_organization_list,
 } from '../../../redux/action/offline';
-import {getCategories} from '../../../services/getCategories';
-import {getExternalUsers} from '../../../services/getUser';
+import {actionStats, totalActionCount} from '../../../redux/action/stats';
+import {getStats} from '../../../services/getStats';
 import {retrieveUserInfo} from '../../../services/local-storage';
-import {getUserByNfc} from '../../../services/nfc';
 import {getOfflineOrganizations} from '../../../services/offline';
-import {
-  getListLocationByOrganization,
-  getListOrganizationWithLocation,
-  getListTenantsWithLocation,
-} from '../../../services/organizations';
 import {NavigationDashboardIcon} from '../../../svg-components/navigation-dashboard';
 import Action from './actions';
 import Announcement from './announcement';
 import Calender from './calendar';
 import Location from './location';
 import Status from './status';
-import {getStats} from '../../../services/getStats';
-import {actionStats, totalActionCount} from '../../../redux/action/stats';
-import {REPORT_ISSUE} from '../../../config/navigation-config';
-import NetInfo from '@react-native-community/netinfo';
 
 const dataArray = [
   {

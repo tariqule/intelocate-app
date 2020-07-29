@@ -41,6 +41,8 @@ target 'intelocate' do
 
   pod 'react-native-nfc-manager', :path => '../node_modules/react-native-nfc-manager'
 
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
   target 'intelocateTests' do
     inherit! :search_paths
     # Pods for testing
