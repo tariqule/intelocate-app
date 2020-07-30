@@ -9,6 +9,9 @@ export const api = axios.create({
     'X-Requested-With': 'XMLHttpRequest',
     'Content-Type': 'application/json;charset=UTF-8',
     'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers':
+      'X-Requested-With, content-type, Authorization',
     Accept: '*/*',
   },
 });

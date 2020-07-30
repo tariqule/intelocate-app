@@ -22,6 +22,8 @@ import LocationInfo from '../home/locationInfo';
 import ProjectInfo from '../home/project-info';
 import CheckList from '../check-list';
 import User from '../user';
+import Message from '../message';
+import Files from '../files';
 
 export const TabView = (props) => {
   const selected = useSelector((state) => state.issueActon.selectedAction);
@@ -103,70 +105,14 @@ export const TabView = (props) => {
       </ScrollView>
 
       <ScrollView tabLabel="ios-chatboxes" style={styles.tabView}>
-        <View style={styles.card}>
-          <Text>Messenger</Text>
-        </View>
+        <Message />
       </ScrollView>
       <ScrollView tabLabel="user" style={styles.tabView}>
         <User />
       </ScrollView>
       <ScrollView tabLabel="ios-attach" style={styles.tabView}>
-        {filesData &&
-          filesData.data[0].files.length > 0 &&
-          filesData.data[0].files.map((e, i) => (
-            <View
-              key={i}
-              style={[
-                styles.card,
-                {
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                },
-              ]}>
-              <View style={{flex: 1}}>
-                <Avatar
-                  source={{
-                    uri: `https://mobile.intelocate.com/api/files/${e.id}/${e.fileName}`,
-                  }}
-                  size="medium"
-                  // title={e.fileName}
-                  // onPress={() => console.log('Works!')}
-                  activeOpacity={0.7}
-                />
-              </View>
-              <View style={{flex: 4}}>
-                <Text style={{color: MAIN_BLUE, fontSize: font_xs}}>
-                  {e.fileName}
-                </Text>
-                <Text style={{color: MAIN_GRAY}}>
-                  Posted by: {e.sender.fullname}
-                </Text>
-              </View>
-            </View>
-          ))}
-        {filesData && filesData.data && filesData.data[0].files.length === 0 && (
-          <View
-            style={[
-              styles.card,
-              {
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
-            ]}>
-            <Text> No files found.</Text>
-          </View>
-        )}
+        <Files />
       </ScrollView>
-      {/* <ScrollView
-        tabLabel="nfc"
-        type={'MaterialCommunityIcons'}
-        style={styles.tabView}>
-        <View style={styles.card}>
-          <Text>NFC feature is not avaiable.</Text>
-        </View>
-      </ScrollView> */}
     </ScrollableTabView>
   );
 };
