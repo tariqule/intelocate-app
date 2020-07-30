@@ -5,6 +5,7 @@ import DashboardScreen from './guarded/dashboard';
 import ActionScreen from './guarded/action';
 import ActionInfo from './guarded/action/action-details';
 import ReportIssue from './guarded/issue/index';
+import ChatScreen from './guarded/chat';
 export {
   SplashScreen,
   LoginScreen,
@@ -13,4 +14,5 @@ export {
   ActionScreen,
   ActionInfo,
   ReportIssue,
+  ChatScreen,
 };

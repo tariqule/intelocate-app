@@ -10,6 +10,7 @@ import {
   SplashScreen,
   ActionInfo,
   ReportIssue,
+  ChatScreen,
 } from '../navigations';
 import {DrawerContent} from '../views/drawer';
 
@@ -23,7 +24,7 @@ export const DASHBOARD = 'DASHBOARD';
 export const ACTION = 'ACTION';
 export const ACTION_INFO = 'ACTION_INFO';
 export const REPORT_ISSUE = 'REPORT_ISSUE';
-
+export const CHAT_SCREEN = 'CHAT_SCREEN';
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
@@ -49,6 +50,7 @@ function Navigator() {
         <Stack.Screen name={DASHBOARD} component={DrawerNavigator} />
         <Stack.Screen name={ACTION_INFO} component={ActionInfo} />
         <Stack.Screen name={REPORT_ISSUE} component={ReportIssue} />
+        <Stack.Screen name={CHAT_SCREEN} component={ChatScreen} />
 
         {/* </Drawer.Navigator> */}
       </Stack.Navigator>

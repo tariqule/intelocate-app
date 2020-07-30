@@ -12,6 +12,8 @@ import moment from 'moment';
 import {GeneralChatIcon} from '../../../../../svg-components/general-chat';
 import {getConversationForTask} from '../../../../../services/message';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useNavigation} from '@react-navigation/native';
+import {CHAT_SCREEN} from '../../../../../config/navigation-config';
 
 /**
  * 9a1506 - task identifier
@@ -20,6 +22,7 @@ import {ScrollView} from 'react-native-gesture-handler';
  *
  */
 const Message = () => {
+  const navigation = useNavigation();
   const [generalChatData, setGeneralChatData] = React.useState<
     undefined | null | any
   >();
@@ -107,7 +110,10 @@ const Message = () => {
         privateChat.length > 0 &&
         privateChat.map((chat, i) => (
           <ScrollView>
-            <TouchableOpacity onPress={() => alert(JSON.stringify(chat))}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate(CHAT_SCREEN, {title: chat.name})
+              }>
               <View
                 style={{
                   flexDirection: 'column',
