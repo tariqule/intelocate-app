@@ -55,7 +55,14 @@ const Message = () => {
       {generalChatData &&
         generalChatData.length > 0 &&
         generalChatData.map((chat, i) => (
-          <TouchableOpacity onPress={() => alert(JSON.stringify(chat))}>
+          <TouchableOpacity
+            onPress={() => {
+              // alert(JSON.stringify(chat));
+              navigation.navigate(CHAT_SCREEN, {
+                title: chat.name || 'General Chat',
+                id: chat.id,
+              });
+            }}>
             <View
               style={{
                 flexDirection: 'column',
@@ -112,7 +119,10 @@ const Message = () => {
           <ScrollView>
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate(CHAT_SCREEN, {title: chat.name})
+                navigation.navigate(CHAT_SCREEN, {
+                  title: chat.name,
+                  id: chat.id,
+                })
               }>
               <View
                 style={{
