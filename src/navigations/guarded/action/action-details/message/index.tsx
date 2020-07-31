@@ -38,14 +38,26 @@ const Message = () => {
       console.log(JSON.stringify(res) + 'conversation retrieved');
       // setData(res);
       !res[0].privateChats && setGeneralChatData(res);
+
       if (res[0].privateChats) {
         setPrivateChat([
           {id: res[0].id, name: 'General Chat'},
-          ...res[0].privateChats.map((e) => ({id: e.id, name: e.name})),
+          ...res[0].privateChats.map((e) => ({
+            id: e.id,
+            name: e.name || e.taskName,
+            senderId: e.creator.id,
+            senderName: e.creator.fullname,
+          })),
         ]);
         console.log(
-          JSON.stringify(res[0].privateChats.map((e) => ({name: e.name}))) +
-            'xxx',
+          JSON.stringify(
+            res[0].privateChats.map((e) => ({
+              id: e.id,
+              name: e.name || e.taskName,
+              senderId: e.creator.id,
+              senderName: e.creator.fullname,
+            })),
+          ) + 'xxx',
         );
       }
     });
@@ -61,6 +73,8 @@ const Message = () => {
               navigation.navigate(CHAT_SCREEN, {
                 title: chat.name || 'General Chat',
                 id: chat.id,
+                senderId: chat.senderId,
+                senderName: chat.senderName,
               });
             }}>
             <View
@@ -91,7 +105,14 @@ const Message = () => {
                 </View>
                 <View style={{flex: 4, flexDirection: 'column'}}>
                   <Text style={{fontSize: font_xs}}>
-                    {chat.name === null ? 'General Chat' : chat.name}
+                    {/* {chat.name && !chat.taskName === null
+                      ? 'General Chat'
+                      : chat.name} */}
+                    {chat.taskName && chat.taskName !== selected.name
+                      ? chat.taskName
+                      : chat.name === null
+                      ? 'General Chat'
+                      : chat.name}
                   </Text>
                   {/* <Text style={{color: MAIN_GRAY}}>
                   {i === 0 ? "General Chat" : users.organization.name}
@@ -122,6 +143,8 @@ const Message = () => {
                 navigation.navigate(CHAT_SCREEN, {
                   title: chat.name,
                   id: chat.id,
+                  senderId: chat.senderId,
+                  senderName: chat.senderName,
                 })
               }>
               <View

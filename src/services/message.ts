@@ -13,3 +13,10 @@ export const getMessageForTask = (chatID, response) => {
     .then((res) => response(res.data))
     .then((err) => console.log(err));
 };
+
+export const sendMessageForTask = (chatID, params, response) => {
+  api
+    .post(`/messages/${chatID}`, params)
+    .then((res) => response(res.data))
+    .then((err) => console.log(err));
+};

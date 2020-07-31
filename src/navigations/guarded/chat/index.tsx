@@ -12,48 +12,102 @@ import {useNavigation} from '@react-navigation/native';
 import {GiftedChat} from 'react-native-gifted-chat';
 import emojiUtils from 'emoji-utils';
 import SlackMessage from './SlackMessage';
+import {getMessageForTask, sendMessageForTask} from '../../../services/message';
 
 const Chat = ({route}, props) => {
-  const {title} = route.params;
+  const {title, id, senderId, senderName} = route.params;
   const [messages, setMessages] = React.useState<undefined | null | any>([]);
 
   const navigation = useNavigation();
 
   const storeMessage = useCallback((newMessages) => {
     setMessages((prevMessages) => [...newMessages, ...prevMessages]);
+    // messages.length == 0 && setMessages(newMessages);
   }, []);
 
   React.useEffect(() => {
-    setMessages([
-      {
-        _id: 2,
-        text: 'This is a quick reply. Do you love Gifted Chat? (checkbox)',
-        createdAt: new Date(),
-        quickReplies: {
-          type: 'checkbox', // or 'radio',
-          values: [
-            {
-              title: 'Yes',
-              value: 'yes',
+    getMessageForTask(id, (res) => {
+      let receivedMessage = res.map((chatRoom) => {
+        // setFlowerName(chatRoom.flower.firstName);
+        // return chatRoom.messages.map(message => {
+        return Object.assign(
+          {},
+          {
+            _id: chatRoom.id,
+            text: chatRoom.msgText,
+            createdAt: chatRoom.createdAt,
+            user: {
+              _id: chatRoom.sender.id,
+              name: chatRoom.sender.fullname,
+              // chatRoom.sender.id === senderId
+              //     ? userName
+              //     : chatRoom.flower.firstName,
+              // avatar: chatRoom.sender.avatar
+              //   ? chatRoom.sender.avatarUrl
+              //   : 'https://cha-shc.ca/_images/_hi5/forum-user.jpg',
+              avatar: 'https://cha-shc.ca/_images/_hi5/forum-user.jpg',
             },
-            {
-              title: 'Yes, let me show you with a picture!',
-              value: 'yes_picture',
-            },
-            {
-              title: 'Nope. What?',
-              value: 'no',
-            },
-          ],
-        },
-        user: {
-          _id: 2,
-          name: 'React Native',
-        },
-      },
-    ]);
+            image:
+              chatRoom.fileName !== null
+                ? `https://mobile.intelocate.com/api/files/${chatRoom.id}/${chatRoom.fileName}`
+                : null,
+          },
+        );
+        // });
+      });
+      console.log(JSON.stringify(receivedMessage) + 'MESSAGE RECEIVED X');
+      storeMessage(receivedMessage);
+      // res.map((message) => {
+      //   let msg = {
+      //     _id: message.id,
+      //     text: message.mesText,
+      //     createdAt: new Date(),
+
+      //     user: {
+      //       _id: message.sender.id,
+      //       name: message.sender.fullname,
+      //     },
+      //   };
+      //   storeMessage(msg);
+      // });
+
+      console.log(JSON.stringify(res) + 'messages');
+    });
+
+    // setMessages([
+    //   {
+    //     _id: 2,
+    //     text: 'This is a quick reply. Do you love Gifted Chat? (checkbox)',
+    //     createdAt: new Date(),
+    //     quickReplies: {
+    //       type: 'checkbox', // or 'radio',
+    //       values: [
+    //         {
+    //           title: 'Yes',
+    //           value: 'yes',
+    //         },
+    //         {
+    //           title: 'Yes, let me show you with a picture!',
+    //           value: 'yes_picture',
+    //         },
+    //         {
+    //           title: 'Nope. What?',
+    //           value: 'no',
+    //         },
+    //       ],
+    //     },
+    //     user: {
+    //       _id: 2,
+    //       name: 'React Native',
+    //     },
+    //   },
+    // ]);
   }, []);
   const onSend = (messages = []) => {
+    console.log(JSON.stringify(messages));
+    sendMessageForTask(id, {text: messages[0].text}, (res) => {
+      console.log(JSON.stringify(res) + 'Message sent..');
+    });
     storeMessage(messages);
   };
 
@@ -91,10 +145,9 @@ const Chat = ({route}, props) => {
           alwaysShowSend
           onSend={(messages) => onSend(messages)}
           user={{
-            _id: 1,
-            avatar:
-              'https://www.detectiveconanworld.com/wiki/images/4/46/The_Criminal_Profile.jpg',
-            name: 'React Native',
+            _id: senderId,
+            avatar: 'https://cha-shc.ca/_images/_hi5/forum-user.jpg',
+            name: senderName,
           }}
           messagesContainerStyle={{
             paddingTop: props.paddingTop,
