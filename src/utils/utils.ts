@@ -30,7 +30,13 @@ export const openImagePicker = (
       const source = {uri: response.uri};
       console.log('FROM IMAGE SOURCE\n\n' + JSON.stringify(response));
       console.log(`Image Picked -----> ${source.uri}`);
-      getImageUri(source.uri, response.type, response.fileName, response.data);
+      getImageUri(
+        source.uri,
+        response.type,
+        response.fileName,
+        response.data,
+        response,
+      );
     }
   });
 };

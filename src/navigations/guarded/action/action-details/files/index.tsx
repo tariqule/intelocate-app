@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Image} from 'react-native';
 import {useSelector} from 'react-redux';
 import {getFormForIssue, getFilesForIssue} from '../../../../../services/issue';
 import {Avatar} from 'react-native-elements';
@@ -8,10 +8,11 @@ import {
   MAIN_GRAY,
   font_xs,
 } from '../../../../../config/global-styles';
+import Lightbox from 'react-native-lightbox';
 
 const Files = () => {
   const selected = useSelector((state) => state.issueActon.selectedAction);
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [height, setHeight] = React.useState<number>();
 
   //files
   const [filesData, setFilesData] = React.useState<any | []>();
@@ -40,15 +41,21 @@ const Files = () => {
               },
             ]}>
             <View style={{flex: 1}}>
-              <Avatar
-                source={{
-                  uri: `https://mobile.intelocate.com/api/files/${e.id}/${e.fileName}`,
+              <Lightbox
+                onOpen={() => {
+                  setHeight(300);
                 }}
-                size="medium"
-                // title={e.fileName}
-                // onPress={() => console.log('Works!')}
-                activeOpacity={0.7}
-              />
+                willClose={() => {
+                  setHeight(50);
+                }}>
+                <Image
+                  style={{height: height || 50}}
+                  resizeMode="contain"
+                  source={{
+                    uri: `https://mobile.intelocate.com/api/files/${e.id}/${e.fileName}`,
+                  }}
+                />
+              </Lightbox>
             </View>
             <View style={{flex: 4}}>
               <Text style={{color: MAIN_BLUE, fontSize: font_xs}}>

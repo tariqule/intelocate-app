@@ -1,3 +1,4 @@
+import {api} from './../../../services/api';
 // import {Queue} from './../../../offline-queue/queue';
 import {
   queueStorage,
@@ -161,10 +162,49 @@ export const report_issue_fn = (useOrganizationID: string, params?: any) => {
         // }
 
         // if (params.files.length === 0) {
+
+        api.defaults.headers.common['Content-Type'] = 'multipart/form-data';
+        // const formData = new FormData();
+        // formData.append('tasks[]', params.tasks);
+        // formData.append('files[]', params.files);
+        // getFormDataForAttachments()
+        // for (var key in params) {
+        // function getFormDataForAttachments({files}): FormData {
+        //   const data = new FormData();
+        //   if (files) {
+        //     files.forEach((f, i) => f && data.append('files[]', f));
+        //   }
+
+        //   return data;
+        // }
+        const formData = new FormData();
+
+        // const files = {files: params.files};
+
+        // const formData = getFormDataForAttachments(files);
+
+        params.tasks &&
+          params.tasks.forEach((task) =>
+            formData.append('tasks[]', JSON.stringify(task)),
+          );
+        params.files &&
+          params.files.forEach((file: File) =>
+            formData.append('files[]', file),
+          );
+
+        // }
+        // let send = params.files ? formData : params;
+
+        console.log(JSON.stringify(formData) + 'send');
         isConnected
           ? Axios.post(
               `https://mobile.intelocate.com/api/tasks/${useOrganizationID}`,
-              params,
+              formData,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              },
             )
               .then((res) => {
                 console.log(
@@ -190,7 +230,7 @@ export const report_issue_fn = (useOrganizationID: string, params?: any) => {
                 // let allUserInfo = {...queuedTask, ...params};
                 let allUserInfo =
                   queuedTask.tasks !== undefined
-                    ? queuedTask.tasks.push(params.tasks)
+                    ? queuedTask.tasks.push(params.tasks[0])
                     : params;
 
                 queuedTask.tasks !== undefined
